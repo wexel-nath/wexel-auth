@@ -1,7 +1,10 @@
 package api
 
 import (
+	"net/http"
+
 	"github.com/julienschmidt/httprouter"
+	"github.com/wexel-nath/wexel-auth/pkg/api/handler"
 )
 
 func GetRouter() *httprouter.Router {
@@ -21,5 +24,11 @@ type route struct {
 }
 
 func getRoutes() []route {
-	return []route{}
+	return []route{
+		{
+			method:  http.MethodGet,
+			pattern: "/healthz",
+			handler: handler.HealthzHandler,
+		},
+	}
 }
