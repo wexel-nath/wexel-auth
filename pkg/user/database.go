@@ -7,12 +7,16 @@ import (
 )
 
 const (
+	// Columns
 	ColumnUserID    = "user_id"
 	ColumnFirstName = "first_name"
 	ColumnLastName  = "last_name"
 	ColumnEmail     = "email"
 	ColumnUsername  = "username"
 	ColumnPassword  = "password"
+
+	// Crypto Salt Algorithm
+	saltAlgorithm = "bf"
 )
 
 var (
@@ -43,12 +47,13 @@ func insert(
 	query := `
 		INSERT INTO user (
 			` + strings.Join(insertUserColumns, ", ") + `
-		) VALUES (
+		)
+		VALUES (
 			$1,
 			$2,
 			$3,
 			$4,
-			crypt($5, gen_salt('bf'))
+			crypt($5, gen_salt('` + saltAlgorithm + `'))
 		)
 		RETURNING
 			` + strings.Join(selectUserColumns, ", ")

@@ -1,7 +1,6 @@
 package user
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -10,15 +9,13 @@ import (
 func TestNewUserFromRow(t *testing.T) {
 	type want struct{
 		user User
-		err  bool
+		wantErr  bool
 	}
-	tests := []struct{
-		name string
+	tests := map[string]struct{
 		row  map[string]interface{}
 		want
 	}{
-		{
-			name: "success",
+		"success": {
 			row:  map[string]interface{}{
 				ColumnUserID:    int64(1),
 				ColumnFirstName: "Dev",
@@ -34,16 +31,74 @@ func TestNewUserFromRow(t *testing.T) {
 					Email:     "dev.user@test.com",
 					Username:  "dev",
 				},
-				err: false,
+				wantErr: false,
+			},
+		},
+		"missing id": {
+			row:  map[string]interface{}{
+				ColumnFirstName: "Dev",
+				ColumnLastName:  "User",
+				ColumnEmail:     "dev.user@test.com",
+				ColumnUsername:  "dev",
+			},
+			want: want{
+				wantErr: true,
+			},
+		},
+		"missing first name": {
+			row:  map[string]interface{}{
+				ColumnUserID:    int64(1),
+				ColumnLastName:  "User",
+				ColumnEmail:     "dev.user@test.com",
+				ColumnUsername:  "dev",
+			},
+			want: want{
+				wantErr: true,
+			},
+		},
+		"missing last name": {
+			row:  map[string]interface{}{
+				ColumnUserID:    int64(1),
+				ColumnFirstName: "Dev",
+				ColumnEmail:     "dev.user@test.com",
+				ColumnUsername:  "dev",
+			},
+			want: want{
+				wantErr: true,
+			},
+		},
+		"missing email": {
+			row:  map[string]interface{}{
+				ColumnUserID:    int64(1),
+				ColumnFirstName: "Dev",
+				ColumnLastName:  "User",
+				ColumnUsername:  "dev",
+			},
+			want: want{
+				wantErr: true,
+			},
+		},
+		"missing username": {
+			row:  map[string]interface{}{
+				ColumnUserID:    int64(1),
+				ColumnFirstName: "Dev",
+				ColumnLastName:  "User",
+				ColumnEmail:     "dev.user@test.com",
+			},
+			want: want{
+				wantErr: true,
 			},
 		},
 	}
 
-	for _, test := range tests {
-		t.Run(test.name, func(st *testing.T) {
+	for name, test := range tests {
+		t.Run(name, func(st *testing.T) {
 			user, err := newUserFromRow(test.row)
-			assert.Equal(t, test.user, user)
-			assert.Equal(t, test.err, err != nil)
+
+			assert.Equal(t, test.wantErr, err != nil)
+			if !test.wantErr {
+				assert.Equal(t, test.user, user)
+			}
 		})
 	}
 }

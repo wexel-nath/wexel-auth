@@ -30,5 +30,15 @@ func getRoutes() []route {
 			pattern: "/healthz",
 			handler: handler.HealthzHandler,
 		},
+		{
+			method: http.MethodPost,
+			pattern: "/login",
+			handler: handler.LoginHandler,
+		},
+		{
+			method: http.MethodPost,
+			pattern: "/user",
+			handler: handler.CreateUserHandler,
+		},
 	}
 }
