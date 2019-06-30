@@ -76,7 +76,7 @@ func TestInsert(t *testing.T) {
 	}
 
 	expectedQuery := `
-		INSERT INTO user \(
+		INSERT INTO users \(
 			first_name,
 			last_name,
 			email,
@@ -181,7 +181,7 @@ func TestSelectByCredentials(t *testing.T) {
 			email,
 			username
 		FROM
-			user
+			users
 		WHERE
 			username = (.+)
 			AND password = crypt\((.+), password\)

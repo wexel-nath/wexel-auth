@@ -45,7 +45,7 @@ func insert(
 	password string,
 ) (map[string]interface{}, error) {
 	query := `
-		INSERT INTO user (
+		INSERT INTO users (
 			` + strings.Join(insertUserColumns, ", ") + `
 		)
 		VALUES (
@@ -68,7 +68,7 @@ func selectByCredentials(username string, password string) (map[string]interface
 		SELECT
 			` + strings.Join(selectUserColumns, ", ") + `
 		FROM
-			user
+			users
 		WHERE
 			` + ColumnUsername + ` = $1
 			AND ` + ColumnPassword + ` = crypt($2, ` + ColumnPassword + `)
