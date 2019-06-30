@@ -5,5 +5,5 @@ CREATE TABLE IF NOT EXISTS users (
     last_name  VARCHAR(16) NOT NULL,
     email      VARCHAR(32) NOT NULL,
     username   VARCHAR(32) NOT NULL UNIQUE,
-    password   VARCHAR(32) NOT NULL
+    password   TEXT        NOT NULL
 );

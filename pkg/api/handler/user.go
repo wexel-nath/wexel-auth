@@ -40,7 +40,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		return
 	}
 
-	logger.Info("userModel: %v", userModel)
+	writeJsonResponse(w, userModel, nil, http.StatusOK)
 }
 
 func CreateUserHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -76,5 +76,5 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 		return
 	}
 
-	logger.Info("userModel: %v", userModel)
+	writeJsonResponse(w, userModel, nil, http.StatusCreated)
 }
