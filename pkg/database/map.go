@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func scanRowToMap(row *sql.Row, colNames []string) (map[string]interface{}, error) {
+func ScanRowToMap(row *sql.Row, colNames []string) (map[string]interface{}, error) {
 	colPointers := colPointers(len(colNames))
 	err := row.Scan(colPointers...)
 	if err != nil {
@@ -15,7 +15,7 @@ func scanRowToMap(row *sql.Row, colNames []string) (map[string]interface{}, erro
 	return colPointersToMap(colNames, colPointers), nil
 }
 
-func scanRowsToMap(rows *sql.Rows, colNames []string) ([]map[string]interface{}, error) {
+func ScanRowsToMap(rows *sql.Rows, colNames []string) ([]map[string]interface{}, error) {
 	var s []map[string]interface{}
 
 	for rows.Next() {
@@ -31,7 +31,7 @@ func scanRowsToMap(rows *sql.Rows, colNames []string) ([]map[string]interface{},
 	return s, nil
 }
 
-func scanSingleColumnToStringSlice(rows *sql.Rows) ([]string, error) {
+func ScanColumnToStringSlice(rows *sql.Rows) ([]string, error) {
 	col := []string{}
 
 	for rows.Next() {

@@ -13,7 +13,7 @@ var (
 	connection *sql.DB
 )
 
-func getConnection() *sql.DB {
+func GetConnection() *sql.DB {
 	if connection == nil || connection.Ping() != nil {
 		var err error
 		connection, err = sql.Open("postgres", config.GetDatabaseURL())
