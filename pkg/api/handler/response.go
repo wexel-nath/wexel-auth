@@ -7,6 +7,11 @@ import (
 	"github.com/wexel-nath/wexel-auth/pkg/logger"
 )
 
+type authResponse struct {
+	Jwt     string `json:"jwt_token"`
+	Refresh string `json:"refresh_token"`
+}
+
 type response struct {
 	Result   interface{} `json:"result"`
 	Messages []string    `json:"messages"`

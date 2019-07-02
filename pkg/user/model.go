@@ -11,7 +11,6 @@ type User struct {
 	LastName  string `json:"last_name"`
 	Email     string `json:"email"`
 	Username  string `json:"username"`
-	Password  string `json:"password"`
 }
 
 func newUserFromRow(row map[string]interface{}) (User, error) {

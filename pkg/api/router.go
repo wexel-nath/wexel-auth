@@ -37,6 +37,11 @@ func getRoutes() []route {
 		},
 		{
 			method: http.MethodPost,
+			pattern: "/refresh",
+			handler: handler.RefreshHandler,
+		},
+		{
+			method: http.MethodPost,
 			pattern: "/user",
 			handler: handler.CreateUserHandler,
 		},

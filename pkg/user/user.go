@@ -1,6 +1,8 @@
 package user
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/wexel-nath/wexel-auth/pkg/logger"
@@ -27,6 +29,9 @@ func Authenticate(username string, password string) (User, error) {
 	logger.Info("authentication user[%s]", username)
 
 	row, err := selectByCredentials(username, password)
+	if err == sql.ErrNoRows {
+		return User{}, errors.New("Invalid username or password")
+	}
 	if err != nil {
 		return User{}, fmt.Errorf("authenticating user[%s] failed: %v", username, err)
 	}

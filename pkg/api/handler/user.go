@@ -10,39 +10,6 @@ import (
 	"github.com/wexel-nath/wexel-auth/pkg/user"
 )
 
-func LoginHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	body, err := ioutil.ReadAll(r.Body)
-	defer r.Body.Close()
-	if err != nil {
-		logger.Error(err)
-		messages := []string { err.Error() }
-		writeJsonResponse(w, nil, messages, http.StatusBadRequest)
-		return
-	}
-
-	var loginRequest struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
-	}
-	err = json.Unmarshal(body, &loginRequest)
-	if err != nil {
-		logger.Error(err)
-		messages := []string { err.Error() }
-		writeJsonResponse(w, nil, messages, http.StatusBadRequest)
-		return
-	}
-
-	userModel, err := user.Authenticate(loginRequest.Username, loginRequest.Password)
-	if err != nil {
-		logger.Error(err)
-		messages := []string { err.Error() }
-		writeJsonResponse(w, nil, messages, http.StatusUnauthorized)
-		return
-	}
-
-	writeJsonResponse(w, userModel, nil, http.StatusOK)
-}
-
 func CreateUserHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	body, err := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
@@ -53,8 +20,14 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 		return
 	}
 
-	var userRequest user.User
-	err = json.Unmarshal(body, &userRequest)
+	var request struct {
+		FirstName string `json:"first_name"`
+		LastName  string `json:"last_name"`
+		Email     string `json:"email"`
+		Username  string `json:"username"`
+		Password  string `json:"password"`
+	}
+	err = json.Unmarshal(body, &request)
 	if err != nil {
 		logger.Error(err)
 		messages := []string { err.Error() }
@@ -63,11 +36,11 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 	}
 
 	userModel, err := user.Create(
-		userRequest.FirstName,
-		userRequest.LastName,
-		userRequest.Email,
-		userRequest.Username,
-		userRequest.Password,
+		request.FirstName,
+		request.LastName,
+		request.Email,
+		request.Username,
+		request.Password,
 	)
 	if err != nil {
 		logger.Error(err)
