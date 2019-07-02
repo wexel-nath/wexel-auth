@@ -6,11 +6,13 @@ import (
 	"net/http"
 
 	"github.com/wexel-nath/wexel-auth/pkg/api"
+	"github.com/wexel-nath/wexel-auth/pkg/auth"
 	"github.com/wexel-nath/wexel-auth/pkg/config"
 )
 
 func main() {
 	config.Configure()
+	auth.Configure()
 
 	startServer()
 }

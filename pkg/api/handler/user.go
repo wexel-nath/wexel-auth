@@ -15,7 +15,7 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 	defer r.Body.Close()
 	if err != nil {
 		logger.Error(err)
-		messages := []string { err.Error() }
+		messages := []string{ err.Error() }
 		writeJsonResponse(w, nil, messages, http.StatusBadRequest)
 		return
 	}
@@ -30,7 +30,7 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 	err = json.Unmarshal(body, &request)
 	if err != nil {
 		logger.Error(err)
-		messages := []string { err.Error() }
+		messages := []string{ err.Error() }
 		writeJsonResponse(w, nil, messages, http.StatusBadRequest)
 		return
 	}
@@ -44,7 +44,7 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 	)
 	if err != nil {
 		logger.Error(err)
-		messages := []string { err.Error() }
+		messages := []string{ err.Error() }
 		writeJsonResponse(w, nil, messages, http.StatusBadRequest)
 		return
 	}
