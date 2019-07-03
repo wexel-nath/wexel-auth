@@ -57,6 +57,12 @@ func LoginHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		Jwt:     jwt,
 		Refresh: "TO.DO.INCOMPLETE",
 	}
+
+	err = auth.Verify(jwt)
+	if err != nil {
+		logger.Error(err)
+	}
+
 	writeJsonResponse(w, tokens, nil, http.StatusOK)
 }
 

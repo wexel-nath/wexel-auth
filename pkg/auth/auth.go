@@ -13,14 +13,29 @@ import (
 
 var(
 	privateKey *rsa.PrivateKey
+	publicKey  *rsa.PublicKey
 )
 
+type Claims struct {
+	User user.User `json:"user"`
+	// todo: add user permissions
+
+	jwt.StandardClaims
+}
+
 func Configure() {
-	keyFile, err := ioutil.ReadFile("keys/test.private.pem")
+	privateKeyFile, err := ioutil.ReadFile("keys/test.private.pem")
 	if err == nil {
-		privateKey, err = jwt.ParseRSAPrivateKeyFromPEM(keyFile)
+		privateKey, err = jwt.ParseRSAPrivateKeyFromPEM(privateKeyFile)
+	}
+	if err != nil {
+		logger.Error(err)
 	}
 
+	publicKeyFile, err := ioutil.ReadFile("keys/test.public.pem")
+	if err == nil {
+		publicKey, err = jwt.ParseRSAPublicKeyFromPEM(publicKeyFile)
+	}
 	if err != nil {
 		logger.Error(err)
 	}
@@ -29,12 +44,7 @@ func Configure() {
 func SignUser(userModel user.User) (string, error) {
 	timestamp := time.Now().Unix()
 
-	claims := struct{
-		User user.User `json:"user"`
-		// todo: add user permissions
-
-		jwt.StandardClaims
-	}{
+	claims := Claims{
 		User: userModel,
 		// user permissions
 
@@ -47,4 +57,20 @@ func SignUser(userModel user.User) (string, error) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
 	return token.SignedString(privateKey)
+}
+
+func publicKeyFunc(token *jwt.Token) (interface{}, error) {
+	return publicKey, nil
+}
+
+func Verify(tokenString string) error {
+	claims := Claims{}
+
+	token, err := jwt.ParseWithClaims(tokenString, &claims, publicKeyFunc)
+	if err != nil {
+		return err
+	}
+
+	logger.Info("claims: %v", token.Claims)
+	return nil
 }
