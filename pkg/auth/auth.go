@@ -2,6 +2,7 @@ package auth
 
 import (
 	"crypto/rsa"
+	"fmt"
 	"io/ioutil"
 	"time"
 
@@ -16,7 +17,7 @@ var(
 	publicKey  *rsa.PublicKey
 )
 
-type Claims struct {
+type claims struct {
 	User user.User `json:"user"`
 	// todo: add user permissions
 
@@ -44,18 +45,18 @@ func Configure() {
 func SignUser(userModel user.User) (string, error) {
 	timestamp := time.Now().Unix()
 
-	claims := Claims{
+	c := claims{
 		User: userModel,
 		// user permissions
 
 		StandardClaims: jwt.StandardClaims{
-			Issuer:    "wexel-auth.herokuapp.com",
+			Issuer:    config.GetJwtIssuer(),
 			IssuedAt:  timestamp,
 			ExpiresAt: timestamp + config.GetJwtExpiry(),
 		},
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodRS256, c)
 	return token.SignedString(privateKey)
 }
 
@@ -63,14 +64,17 @@ func publicKeyFunc(token *jwt.Token) (interface{}, error) {
 	return publicKey, nil
 }
 
-func Verify(tokenString string) error {
-	claims := Claims{}
-
-	token, err := jwt.ParseWithClaims(tokenString, &claims, publicKeyFunc)
+func Verify(tokenString string) (user.User, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &claims{}, publicKeyFunc)
 	if err != nil {
-		return err
+		return user.User{}, err
 	}
 
-	logger.Info("claims: %v", token.Claims)
-	return nil
+	c, ok := token.Claims.(*claims)
+	if !ok {
+		return user.User{}, fmt.Errorf("error casting token.Claims[%v] to Claims", token)
+	}
+
+	logger.Info("claims: %v", c)
+	return c.User, nil
 }

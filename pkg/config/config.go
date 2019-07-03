@@ -8,6 +8,7 @@ func Configure() {
 
 	// Auth config
 	viper.Set("JWT_EXPIRY", 5 * 60)
+	viper.Set("JWT_ISSUER", "wexel-auth.herokuapp.com")
 
 	// Heroku Port
 	viper.BindEnv("PORT")
@@ -18,6 +19,10 @@ func Configure() {
 
 func GetJwtExpiry() int64 {
 	return viper.GetInt64("JWT_EXPIRY")
+}
+
+func GetJwtIssuer() string {
+	return viper.GetString("JWT_ISSUER")
 }
 
 func GetPort() string {
