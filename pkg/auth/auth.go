@@ -2,11 +2,12 @@ package auth
 
 import (
 	"crypto/rsa"
-	"github.com/wexel-nath/wexel-auth/pkg/logger"
+	"io/ioutil"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/wexel-nath/wexel-auth/pkg/config"
+	"github.com/wexel-nath/wexel-auth/pkg/logger"
 	"github.com/wexel-nath/wexel-auth/pkg/user"
 )
 
@@ -15,15 +16,14 @@ var(
 )
 
 func Configure() {
-	// todo: get PEM rsa key
-	pem := []byte("")
-	key, err := jwt.ParseRSAPrivateKeyFromPEM(pem)
-	if err != nil {
-		logger.Error(err)
-		return
+	keyFile, err := ioutil.ReadFile("keys/test.private.pem")
+	if err == nil {
+		privateKey, err = jwt.ParseRSAPrivateKeyFromPEM(keyFile)
 	}
 
-	privateKey = key
+	if err != nil {
+		logger.Error(err)
+	}
 }
 
 func SignUser(userModel user.User) (string, error) {
