@@ -5,19 +5,14 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/julienschmidt/httprouter"
-	"github.com/wexel-nath/wexel-auth/pkg/logger"
 	"github.com/wexel-nath/wexel-auth/pkg/user"
 )
 
-func CreateUserHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func HandleCreateUser(r *http.Request) (interface{}, int, error) {
 	body, err := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {
-		logger.Error(err)
-		messages := []string{ err.Error() }
-		writeJsonResponse(w, nil, messages, http.StatusBadRequest)
-		return
+		return nil, http.StatusBadRequest, err
 	}
 
 	var request struct {
@@ -29,10 +24,7 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 	}
 	err = json.Unmarshal(body, &request)
 	if err != nil {
-		logger.Error(err)
-		messages := []string{ err.Error() }
-		writeJsonResponse(w, nil, messages, http.StatusBadRequest)
-		return
+		return nil, http.StatusBadRequest, err
 	}
 
 	userModel, err := user.Create(
@@ -43,11 +35,7 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 		request.Password,
 	)
 	if err != nil {
-		logger.Error(err)
-		messages := []string{ err.Error() }
-		writeJsonResponse(w, nil, messages, http.StatusBadRequest)
-		return
+		return nil, http.StatusBadRequest, err
 	}
-
-	writeJsonResponse(w, userModel, nil, http.StatusCreated)
+	return userModel, http.StatusCreated, nil
 }

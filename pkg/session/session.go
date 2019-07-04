@@ -19,9 +19,20 @@ func Create(userID int64) (Session, error) {
 }
 
 func GetCurrentSession(sessionID string, userID int64) (Session, error) {
-	logger.Info("Getting current session for user[%d]", userID)
+	logger.Info("Getting current session[%s] for user[%d]", sessionID, userID)
 
 	row, err := selectActiveSession(sessionID, userID)
+	if err != nil {
+		return Session{}, err
+	}
+
+	return newSessionFromRow(row)
+}
+
+func ExtendCurrentSession(sessionID string, userID int64) (Session, error) {
+	logger.Info("Updating current session[%s] for user[%d]", sessionID, userID)
+
+	row, err := updateSessionExpiry(sessionID, userID)
 	if err != nil {
 		return Session{}, err
 	}

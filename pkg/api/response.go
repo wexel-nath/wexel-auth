@@ -1,17 +1,11 @@
-package handler
+package api
 
 import (
 	"encoding/json"
-	"net/http"
-
 	"github.com/julienschmidt/httprouter"
 	"github.com/wexel-nath/wexel-auth/pkg/logger"
+	"net/http"
 )
-
-type authResponse struct {
-	Jwt     string `json:"jwt_token"`
-	Refresh string `json:"refresh_token"`
-}
 
 type response struct {
 	Result   interface{} `json:"result"`
@@ -42,7 +36,7 @@ func writeJsonResponse(
 	resp.Write(bytes)
 }
 
-func RequestHandler(handler func(r *http.Request) (interface{}, int, error)) httprouter.Handle {
+func requestHandler(handler func(r *http.Request) (interface{}, int, error)) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		messages := []string(nil)
 

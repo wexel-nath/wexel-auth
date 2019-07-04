@@ -65,3 +65,7 @@ func selectActiveSession(sessionID string, userID int64) (map[string]interface{}
 	row := db.QueryRow(query, sessionID, userID, now)
 	return database.ScanRowToMap(row, sessionColumns)
 }
+
+func updateSessionExpiry(sessionID string, userID int64) (map[string]interface{}, error) {
+	return nil, nil
+}
