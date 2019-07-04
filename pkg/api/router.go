@@ -33,7 +33,7 @@ func getRoutes() []route {
 		{
 			method: http.MethodPost,
 			pattern: "/login",
-			handler: handler.LoginHandler,
+			handler: handler.RequestHandler(handler.HandleLogin),
 		},
 		{
 			method: http.MethodPost,

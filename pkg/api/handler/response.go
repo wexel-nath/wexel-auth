@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/julienschmidt/httprouter"
 	"github.com/wexel-nath/wexel-auth/pkg/logger"
 )
 
@@ -39,4 +40,18 @@ func writeJsonResponse(
 	resp.Header().Set("Content-Type", "application/json")
 	resp.WriteHeader(status)
 	resp.Write(bytes)
+}
+
+func RequestHandler(handler func(r *http.Request) (interface{}, int, error)) httprouter.Handle {
+	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+		messages := []string(nil)
+
+		result, statusCode, err := handler(r)
+		if err != nil {
+			logger.Error(err)
+			messages = []string{ err.Error() }
+		}
+
+		writeJsonResponse(w, result, messages, statusCode)
+	}
 }

@@ -48,11 +48,11 @@ func TestInsert(t *testing.T) {
 			},
 			want: want{
 				row: map[string]interface{}{
-					ColumnUserID:    int64(1),
-					ColumnFirstName: "Dev",
-					ColumnLastName:  "User",
-					ColumnEmail:     "dev.user@test.com",
-					ColumnUsername:  "dev",
+					columnUserID:    int64(1),
+					columnFirstName: "Dev",
+					columnLastName:  "User",
+					columnEmail:     "dev.user@test.com",
+					columnUsername:  "dev",
 				},
 				err: nil,
 			},
@@ -149,11 +149,11 @@ func TestSelectByCredentials(t *testing.T) {
 			},
 			want: want{
 				row: map[string]interface{}{
-					ColumnUserID:    int64(1),
-					ColumnFirstName: "Dev",
-					ColumnLastName:  "User",
-					ColumnEmail:     "dev.user@test.com",
-					ColumnUsername:  "dev",
+					columnUserID:    int64(1),
+					columnFirstName: "Dev",
+					columnLastName:  "User",
+					columnEmail:     "dev.user@test.com",
+					columnUsername:  "dev",
 				},
 				err: nil,
 			},

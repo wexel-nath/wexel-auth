@@ -17,20 +17,20 @@ func newUserFromRow(row map[string]interface{}) (User, error) {
 	user := User{}
 	var ok bool
 
-	if user.UserID, ok = row[ColumnUserID].(int64); !ok {
-		return user, fmt.Errorf("row[%v] does not contain field[%s] type[int64]", row, ColumnUserID)
+	if user.UserID, ok = row[columnUserID].(int64); !ok {
+		return user, fmt.Errorf("row[%v] does not contain field[%s] type[int64]", row, columnUserID)
 	}
-	if user.FirstName, ok = row[ColumnFirstName].(string); !ok {
-		return user, fmt.Errorf("row[%v] does not contain field[%s] type[string]", row, ColumnFirstName)
+	if user.FirstName, ok = row[columnFirstName].(string); !ok {
+		return user, fmt.Errorf("row[%v] does not contain field[%s] type[string]", row, columnFirstName)
 	}
-	if user.LastName, ok = row[ColumnLastName].(string); !ok {
-		return user, fmt.Errorf("row[%v] does not contain field[%s] type[string]", row, ColumnLastName)
+	if user.LastName, ok = row[columnLastName].(string); !ok {
+		return user, fmt.Errorf("row[%v] does not contain field[%s] type[string]", row, columnLastName)
 	}
-	if user.Email, ok = row[ColumnEmail].(string); !ok {
-		return user, fmt.Errorf("row[%v] does not contain field[%s] type[string]", row, ColumnEmail)
+	if user.Email, ok = row[columnEmail].(string); !ok {
+		return user, fmt.Errorf("row[%v] does not contain field[%s] type[string]", row, columnEmail)
 	}
-	if user.Username, ok = row[ColumnUsername].(string); !ok {
-		return user, fmt.Errorf("row[%v] does not contain field[%s] type[string]", row, ColumnUsername)
+	if user.Username, ok = row[columnUsername].(string); !ok {
+		return user, fmt.Errorf("row[%v] does not contain field[%s] type[string]", row, columnUsername)
 	}
 
 	return user, nil

@@ -15,7 +15,7 @@ func Create(
 	username string,
 	password string,
 ) (User, error) {
-	logger.Info("creating user[%s]", username)
+	logger.Info("Creating user[%s]", username)
 
 	row, err := insert(firstName, lastName, email, username, password)
 	if err != nil {
@@ -26,7 +26,7 @@ func Create(
 }
 
 func Authenticate(username string, password string) (User, error) {
-	logger.Info("authentication user[%s]", username)
+	logger.Info("Authenticating user[%s]", username)
 
 	row, err := selectByCredentials(username, password)
 	if err == sql.ErrNoRows {

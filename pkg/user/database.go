@@ -8,12 +8,12 @@ import (
 
 const (
 	// Columns
-	ColumnUserID    = "user_id"
-	ColumnFirstName = "first_name"
-	ColumnLastName  = "last_name"
-	ColumnEmail     = "email"
-	ColumnUsername  = "username"
-	ColumnPassword  = "password"
+	columnUserID    = "user_id"
+	columnFirstName = "first_name"
+	columnLastName  = "last_name"
+	columnEmail     = "email"
+	columnUsername  = "username"
+	columnPassword  = "password"
 
 	// Crypto Salt Algorithm
 	saltAlgorithm = "bf"
@@ -21,19 +21,19 @@ const (
 
 var (
 	insertUserColumns = []string{
-		ColumnFirstName,
-		ColumnLastName,
-		ColumnEmail,
-		ColumnUsername,
-		ColumnPassword,
+		columnFirstName,
+		columnLastName,
+		columnEmail,
+		columnUsername,
+		columnPassword,
 	}
 
 	selectUserColumns = []string{
-		ColumnUserID,
-		ColumnFirstName,
-		ColumnLastName,
-		ColumnEmail,
-		ColumnUsername,
+		columnUserID,
+		columnFirstName,
+		columnLastName,
+		columnEmail,
+		columnUsername,
 	}
 )
 
@@ -70,8 +70,8 @@ func selectByCredentials(username string, password string) (map[string]interface
 		FROM
 			users
 		WHERE
-			` + ColumnUsername + ` = $1
-			AND ` + ColumnPassword + ` = crypt($2, ` + ColumnPassword + `)
+			` + columnUsername + ` = $1
+			AND ` + columnPassword + ` = crypt($2, ` + columnPassword + `)
 	`
 
 	db := database.GetConnection()

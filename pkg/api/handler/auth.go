@@ -10,18 +10,15 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/wexel-nath/wexel-auth/pkg/auth"
 	"github.com/wexel-nath/wexel-auth/pkg/logger"
+	"github.com/wexel-nath/wexel-auth/pkg/session"
 	"github.com/wexel-nath/wexel-auth/pkg/user"
 )
 
-
-func LoginHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func HandleLogin(r *http.Request) (interface{}, int, error) {
 	body, err := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {
-		logger.Error(err)
-		messages := []string { err.Error() }
-		writeJsonResponse(w, nil, messages, http.StatusBadRequest)
-		return
+		return nil, http.StatusBadRequest, err
 	}
 
 	var request struct {
@@ -30,40 +27,37 @@ func LoginHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	}
 	err = json.Unmarshal(body, &request)
 	if err != nil {
-		logger.Error(err)
-		messages := []string { err.Error() }
-		writeJsonResponse(w, nil, messages, http.StatusBadRequest)
-		return
+		return nil, http.StatusBadRequest, err
 	}
 
 	userModel, err := user.Authenticate(request.Username, request.Password)
 	if err != nil {
-		logger.Error(err)
-		messages := []string { err.Error() }
-		writeJsonResponse(w, nil, messages, http.StatusUnauthorized)
-		return
+		return nil, http.StatusUnauthorized, err
 	}
 
 	jwt, err := auth.SignUser(userModel)
 	if err != nil {
-		logger.Error(err)
-		messages := []string { err.Error() }
-		writeJsonResponse(w, nil, messages, http.StatusInternalServerError)
-		return
+		return nil, http.StatusInternalServerError, err
 	}
 
-	// todo: return valid refresh token
+	userSession, err := session.Create(userModel.UserID)
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+
 	tokens := authResponse{
 		Jwt:     jwt,
-		Refresh: "TO.DO.INCOMPLETE",
+		Refresh: userSession.SessionID,
 	}
-	writeJsonResponse(w, tokens, nil, http.StatusOK)
+	return tokens, http.StatusOK, nil
 }
 
 func RefreshHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	userModel, err := getAuthenticatedUser(r)
 	if err != nil {
-		writeJsonResponse(w, nil, []string{ err.Error() }, http.StatusUnauthorized)
+		logger.Error(err)
+		messages := []string{ err.Error() }
+		writeJsonResponse(w, nil, messages, http.StatusUnauthorized)
 		return
 	}
 
@@ -87,6 +81,8 @@ func RefreshHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params)
 		return
 	}
 
+	// todo: check if session is valid
+
 	jwt, err := auth.SignUser(userModel)
 	if err != nil {
 		logger.Error(err)
@@ -95,7 +91,7 @@ func RefreshHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params)
 		return
 	}
 
-	// todo: return valid JWT and refresh token
+	// todo: extend session and return refresh token
 	tokens := authResponse{
 		Jwt:     jwt,
 		Refresh: "TO.DO.INCOMPLETE",

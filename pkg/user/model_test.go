@@ -17,11 +17,11 @@ func TestNewUserFromRow(t *testing.T) {
 	}{
 		"success": {
 			row:  map[string]interface{}{
-				ColumnUserID:    int64(1),
-				ColumnFirstName: "Dev",
-				ColumnLastName:  "User",
-				ColumnEmail:     "dev.user@test.com",
-				ColumnUsername:  "dev",
+				columnUserID:    int64(1),
+				columnFirstName: "Dev",
+				columnLastName:  "User",
+				columnEmail:     "dev.user@test.com",
+				columnUsername:  "dev",
 			},
 			want: want{
 				user: User{
@@ -36,10 +36,10 @@ func TestNewUserFromRow(t *testing.T) {
 		},
 		"missing id": {
 			row:  map[string]interface{}{
-				ColumnFirstName: "Dev",
-				ColumnLastName:  "User",
-				ColumnEmail:     "dev.user@test.com",
-				ColumnUsername:  "dev",
+				columnFirstName: "Dev",
+				columnLastName:  "User",
+				columnEmail:     "dev.user@test.com",
+				columnUsername:  "dev",
 			},
 			want: want{
 				wantErr: true,
@@ -47,10 +47,10 @@ func TestNewUserFromRow(t *testing.T) {
 		},
 		"missing first name": {
 			row:  map[string]interface{}{
-				ColumnUserID:    int64(1),
-				ColumnLastName:  "User",
-				ColumnEmail:     "dev.user@test.com",
-				ColumnUsername:  "dev",
+				columnUserID:    int64(1),
+				columnLastName:  "User",
+				columnEmail:     "dev.user@test.com",
+				columnUsername:  "dev",
 			},
 			want: want{
 				wantErr: true,
@@ -58,10 +58,10 @@ func TestNewUserFromRow(t *testing.T) {
 		},
 		"missing last name": {
 			row:  map[string]interface{}{
-				ColumnUserID:    int64(1),
-				ColumnFirstName: "Dev",
-				ColumnEmail:     "dev.user@test.com",
-				ColumnUsername:  "dev",
+				columnUserID:    int64(1),
+				columnFirstName: "Dev",
+				columnEmail:     "dev.user@test.com",
+				columnUsername:  "dev",
 			},
 			want: want{
 				wantErr: true,
@@ -69,10 +69,10 @@ func TestNewUserFromRow(t *testing.T) {
 		},
 		"missing email": {
 			row:  map[string]interface{}{
-				ColumnUserID:    int64(1),
-				ColumnFirstName: "Dev",
-				ColumnLastName:  "User",
-				ColumnUsername:  "dev",
+				columnUserID:    int64(1),
+				columnFirstName: "Dev",
+				columnLastName:  "User",
+				columnUsername:  "dev",
 			},
 			want: want{
 				wantErr: true,
@@ -80,10 +80,10 @@ func TestNewUserFromRow(t *testing.T) {
 		},
 		"missing username": {
 			row:  map[string]interface{}{
-				ColumnUserID:    int64(1),
-				ColumnFirstName: "Dev",
-				ColumnLastName:  "User",
-				ColumnEmail:     "dev.user@test.com",
+				columnUserID:    int64(1),
+				columnFirstName: "Dev",
+				columnLastName:  "User",
+				columnEmail:     "dev.user@test.com",
 			},
 			want: want{
 				wantErr: true,
