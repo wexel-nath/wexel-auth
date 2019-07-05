@@ -54,9 +54,9 @@ func selectActiveSession(sessionID string, userID int64) (map[string]interface{}
 		FROM
 			session
 		WHERE
-			session_id = $1
-			AND user_id = $2
-			AND expiry > $3
+			` + columnSessionID + ` = $1
+			AND ` + columnUserID + ` = $2
+			AND ` + columnExpiry + ` > $3
 	`
 
 	now := time.Now().Unix()
@@ -67,5 +67,22 @@ func selectActiveSession(sessionID string, userID int64) (map[string]interface{}
 }
 
 func updateSessionExpiry(sessionID string, userID int64) (map[string]interface{}, error) {
-	return nil, nil
+	query := `
+		UPDATE
+			session
+		SET
+			` + columnExpiry + ` = $1
+		WHERE
+			` + columnSessionID + ` = $2
+			AND ` + columnUserID + ` = $3
+			AND ` + columnExpiry + ` > $4
+		RETURNING
+			` + strings.Join(sessionColumns, ", ")
+
+	now := time.Now().Unix()
+	newExpiry := now + config.GetSessionExpiry()
+
+	db := database.GetConnection()
+	row := db.QueryRow(query, newExpiry, sessionID, userID, now)
+	return database.ScanRowToMap(row, sessionColumns)
 }

@@ -57,7 +57,7 @@ func HandleLogin(r *http.Request) (interface{}, int, error) {
 
 func HandleRefresh(r *http.Request) (interface{}, int, error) {
 	userModel, err := getAuthenticatedUser(r)
-	if err != nil {
+	if err != nil && err != auth.ErrExpiredToken {
 		return nil, http.StatusUnauthorized, err
 	}
 
@@ -75,7 +75,7 @@ func HandleRefresh(r *http.Request) (interface{}, int, error) {
 		return nil, http.StatusBadRequest, err
 	}
 
-	s, err := session.GetCurrentSession(request.RefreshToken, userModel.UserID)
+	s, err := session.ExtendCurrentSession(request.RefreshToken, userModel.UserID)
 	if err != nil {
 		return nil, http.StatusUnauthorized, err
 	}
@@ -84,8 +84,6 @@ func HandleRefresh(r *http.Request) (interface{}, int, error) {
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
 	}
-
-	// todo: extend session
 
 	tokens := authResponse{
 		Jwt:     jwt,

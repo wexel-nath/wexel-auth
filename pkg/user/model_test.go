@@ -8,8 +8,8 @@ import (
 
 func TestNewUserFromRow(t *testing.T) {
 	type want struct{
-		user User
-		wantErr  bool
+		user    User
+		wantErr bool
 	}
 	tests := map[string]struct{
 		row  map[string]interface{}

@@ -2,7 +2,7 @@ package auth
 
 import (
 	"crypto/rsa"
-	"fmt"
+	"errors"
 	"io/ioutil"
 	"time"
 
@@ -15,6 +15,8 @@ import (
 var(
 	privateKey *rsa.PrivateKey
 	publicKey  *rsa.PublicKey
+
+	ErrExpiredToken = errors.New("expired jwt needs refresh")
 )
 
 type claims struct {
@@ -65,16 +67,14 @@ func publicKeyFunc(token *jwt.Token) (interface{}, error) {
 }
 
 func Verify(tokenString string) (user.User, error) {
-	token, err := jwt.ParseWithClaims(tokenString, &claims{}, publicKeyFunc)
+	var c claims
+	_, err := jwt.ParseWithClaims(tokenString, &c, publicKeyFunc)
 	if err != nil {
-		return user.User{}, err
+		v, ok := err.(*jwt.ValidationError)
+		if ok && v.Errors == jwt.ValidationErrorExpired {
+			err = ErrExpiredToken
+		}
 	}
 
-	c, ok := token.Claims.(*claims)
-	if !ok {
-		return user.User{}, fmt.Errorf("error casting token.Claims[%v] to Claims", token)
-	}
-
-	logger.Info("claims: %v", c)
-	return c.User, nil
+	return c.User, err
 }

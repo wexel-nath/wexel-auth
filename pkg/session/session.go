@@ -1,6 +1,15 @@
 package session
 
-import "github.com/wexel-nath/wexel-auth/pkg/logger"
+import (
+	"database/sql"
+	"errors"
+
+	"github.com/wexel-nath/wexel-auth/pkg/logger"
+)
+
+var (
+	ErrSessionExpired = errors.New("session has expired")
+)
 
 func Create(userID int64) (Session, error) {
 	logger.Info("Creating session for user[%d]", userID)
@@ -22,6 +31,9 @@ func GetCurrentSession(sessionID string, userID int64) (Session, error) {
 	logger.Info("Getting current session[%s] for user[%d]", sessionID, userID)
 
 	row, err := selectActiveSession(sessionID, userID)
+	if err == sql.ErrNoRows {
+		return Session{}, ErrSessionExpired
+	}
 	if err != nil {
 		return Session{}, err
 	}
@@ -33,6 +45,9 @@ func ExtendCurrentSession(sessionID string, userID int64) (Session, error) {
 	logger.Info("Updating current session[%s] for user[%d]", sessionID, userID)
 
 	row, err := updateSessionExpiry(sessionID, userID)
+	if err == sql.ErrNoRows {
+		return Session{}, ErrSessionExpired
+	}
 	if err != nil {
 		return Session{}, err
 	}
