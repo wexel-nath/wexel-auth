@@ -6,9 +6,9 @@ VALUES
     ('Continuance', 'CRM service for Continuance Pictures')
 ON CONFLICT DO NOTHING;
 
-CREATE OR REPLACE FUNCTION add_permission(name TEXT, description TEXT, s_name TEXT) AS '
+CREATE OR REPLACE FUNCTION add_permission(name TEXT, description TEXT, s_name TEXT) RETURNS VOID AS '
     BEGIN
-        INSERT INTO permission (permission_name, permission_description)
+        INSERT INTO permission (permission_name, permission_description, service_id)
         SELECT name, description, service_id
         FROM service
         WHERE service_name = s_name;
