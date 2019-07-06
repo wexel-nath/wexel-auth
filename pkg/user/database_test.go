@@ -183,8 +183,8 @@ func TestSelectByCredentials(t *testing.T) {
 		FROM
 			users
 		WHERE
-			username = (.+)
-			AND password = crypt\((.+), password\)
+			username = \$1
+			AND password = crypt\(\$2, password\)
 	`
 
 	for name, test := range tests {

@@ -9,6 +9,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/wexel-nath/wexel-auth/pkg/config"
 	"github.com/wexel-nath/wexel-auth/pkg/logger"
+	"github.com/wexel-nath/wexel-auth/pkg/permission"
 	"github.com/wexel-nath/wexel-auth/pkg/user"
 )
 
@@ -20,8 +21,8 @@ var(
 )
 
 type claims struct {
-	User user.User `json:"user"`
-	// todo: add user permissions
+	User        user.User                  `json:"user"`
+	Permissions permission.UserPermissions `json:"permissions"`
 
 	jwt.StandardClaims
 }
@@ -44,13 +45,14 @@ func Configure() {
 	}
 }
 
-func SignUser(userModel user.User) (string, error) {
+func SignUser(userModel user.User, permissions permission.UserPermissions) (string, error) {
 	timestamp := time.Now().Unix()
 
 	c := claims{
-		User: userModel,
-		// user permissions
+		User:        userModel,
+		Permissions: permissions,
 
+		// default claims
 		StandardClaims: jwt.StandardClaims{
 			Issuer:    config.GetJwtIssuer(),
 			IssuedAt:  timestamp,

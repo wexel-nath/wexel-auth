@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/wexel-nath/wexel-auth/pkg/auth"
+	"github.com/wexel-nath/wexel-auth/pkg/permission"
 	"github.com/wexel-nath/wexel-auth/pkg/session"
 	"github.com/wexel-nath/wexel-auth/pkg/user"
 )
@@ -38,7 +39,12 @@ func HandleLogin(r *http.Request) (interface{}, int, error) {
 		return nil, http.StatusUnauthorized, err
 	}
 
-	jwt, err := auth.SignUser(userModel)
+	permissions, err := permission.GetAllForUser(userModel.UserID)
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+
+	jwt, err := auth.SignUser(userModel, permissions)
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
 	}
@@ -80,7 +86,12 @@ func HandleRefresh(r *http.Request) (interface{}, int, error) {
 		return nil, http.StatusUnauthorized, err
 	}
 
-	jwt, err := auth.SignUser(userModel)
+	permissions, err := permission.GetAllForUser(userModel.UserID)
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+
+	jwt, err := auth.SignUser(userModel, permissions)
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
 	}

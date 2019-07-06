@@ -167,11 +167,11 @@ func TestUpdateSessionExpiry(t *testing.T) {
 		UPDATE
 			session
 		SET
-			expiry = (.+)
+			expiry = \$1
 		WHERE
-			session_id = (.+)
-			AND user_id = (.+)
-			AND expiry > (.+)
+			session_id = \$2
+			AND user_id = \$3
+			AND expiry > \$4
 		RETURNING
 			session_id,
 			user_id,
