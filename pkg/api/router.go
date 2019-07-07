@@ -12,6 +12,7 @@ func GetRouter() *httprouter.Router {
 
 	for _, route := range getRoutes() {
 		router.Handle(route.method, route.pattern, middleware(route.handler))
+		router.Handle(http.MethodOptions, route.pattern, enableCors)
 	}
 
 	return router
@@ -46,4 +47,11 @@ func getRoutes() []route {
 			handler: authRequestHandler(handler.HandleCreateUser, "", "user.create"),
 		},
 	}
+}
+
+func enableCors(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+	w.WriteHeader(http.StatusNoContent)
 }

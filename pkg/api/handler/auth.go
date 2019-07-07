@@ -12,6 +12,7 @@ import (
 )
 
 type authResponse struct {
+	User    auth.User `json:"user"`
 	Jwt     string `json:"jwt_token"`
 	Refresh string `json:"refresh_token"`
 }
@@ -42,7 +43,8 @@ func HandleLogin(r *http.Request) (interface{}, int, error) {
 		return nil, http.StatusInternalServerError, err
 	}
 
-	jwt, err := auth.Sign(buildAuthUserModel(userModel, permissions))
+	authUser := buildAuthUserModel(userModel, permissions)
+	jwt, err := auth.Sign(authUser)
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
 	}
@@ -53,6 +55,7 @@ func HandleLogin(r *http.Request) (interface{}, int, error) {
 	}
 
 	tokens := authResponse{
+		User:    authUser,
 		Jwt:     jwt,
 		Refresh: userSession.SessionID,
 	}
