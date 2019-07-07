@@ -11,8 +11,7 @@ func GetRouter() *httprouter.Router {
 	router := httprouter.New()
 
 	for _, route := range getRoutes() {
-		handle := requestHandler(route.handler)
-		router.Handle(route.method, route.pattern, middleware(handle))
+		router.Handle(route.method, route.pattern, middleware(route.handler))
 	}
 
 	return router
@@ -21,7 +20,7 @@ func GetRouter() *httprouter.Router {
 type route struct {
 	method  string
 	pattern string
-	handler func(r *http.Request) (interface{}, int, error)
+	handler httprouter.Handle
 }
 
 func getRoutes() []route {
@@ -29,22 +28,22 @@ func getRoutes() []route {
 		{
 			method:  http.MethodGet,
 			pattern: "/healthz",
-			handler: handler.HandleHealthz,
+			handler: requestHandler(handler.HandleHealthz),
 		},
 		{
 			method: http.MethodPost,
 			pattern: "/login",
-			handler: handler.HandleLogin,
+			handler: requestHandler(handler.HandleLogin),
 		},
 		{
 			method: http.MethodPost,
 			pattern: "/refresh",
-			handler: handler.HandleRefresh,
+			handler: requestHandler(handler.HandleRefresh),
 		},
 		{
 			method: http.MethodPost,
 			pattern: "/user",
-			handler: handler.HandleCreateUser,
+			handler: authRequestHandler(handler.HandleCreateUser, "", "user.create"),
 		},
 	}
 }

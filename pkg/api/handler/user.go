@@ -5,10 +5,11 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/wexel-nath/wexel-auth/pkg/auth"
 	"github.com/wexel-nath/wexel-auth/pkg/user"
 )
 
-func HandleCreateUser(r *http.Request) (interface{}, int, error) {
+func HandleCreateUser(r *http.Request, _ auth.User) (interface{}, int, error) {
 	body, err := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {

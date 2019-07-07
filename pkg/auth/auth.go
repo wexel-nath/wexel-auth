@@ -3,7 +3,6 @@ package auth
 import (
 	"crypto/rsa"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -19,6 +18,7 @@ var(
 	privateKey *rsa.PrivateKey
 
 	ErrExpiredToken = errors.New("expired jwt needs refresh")
+	ErrNotAuthorized = errors.New("not authorized for this service or capability")
 )
 
 type User struct {
@@ -151,23 +151,22 @@ func authorize(token string, service string, capability string) (User, error) {
 	}
 
 	servicePermissions, ok := user.Permissions[service]
-	if !ok {
-		return user, fmt.Errorf("not authorized for service %s", service)
+	if service != "" && !ok {
+		return user, ErrNotAuthorized
 	}
 
-	if capability == "" {
-		return user, nil
+	if capability != "" {
+		allPermissions, ok := user.Permissions["ALL"]
+		if !ok {
+			allPermissions = []string{}
+		}
+
+		servicePermissions = append(servicePermissions, allPermissions...)
+		if !inStringSlice(capability, servicePermissions) {
+			return user, ErrNotAuthorized
+		}
 	}
 
-	allPermissions, ok := user.Permissions["ALL"]
-	if !ok {
-		allPermissions = []string{}
-	}
-
-	servicePermissions = append(servicePermissions, allPermissions...)
-	if !inStringSlice(capability, servicePermissions) {
-		return user, fmt.Errorf("missing capability %s", capability)
-	}
 	return user, nil
 }
 
