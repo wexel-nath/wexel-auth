@@ -2,10 +2,8 @@ package handler
 
 import (
 	"encoding/json"
-	"errors"
 	"io/ioutil"
 	"net/http"
-	"strings"
 
 	"github.com/wexel-nath/wexel-auth/pkg/auth"
 	"github.com/wexel-nath/wexel-auth/pkg/permission"
@@ -44,7 +42,7 @@ func HandleLogin(r *http.Request) (interface{}, int, error) {
 		return nil, http.StatusInternalServerError, err
 	}
 
-	jwt, err := auth.SignUser(userModel, permissions)
+	jwt, err := auth.Sign(buildAuthUserModel(userModel, permissions))
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
 	}
@@ -62,7 +60,7 @@ func HandleLogin(r *http.Request) (interface{}, int, error) {
 }
 
 func HandleRefresh(r *http.Request) (interface{}, int, error) {
-	userModel, err := getAuthenticatedUser(r)
+	authUser, err := auth.GetAuthenticatedUser(r)
 	if err != nil && err != auth.ErrExpiredToken {
 		return nil, http.StatusUnauthorized, err
 	}
@@ -81,17 +79,12 @@ func HandleRefresh(r *http.Request) (interface{}, int, error) {
 		return nil, http.StatusBadRequest, err
 	}
 
-	s, err := session.ExtendCurrentSession(request.RefreshToken, userModel.UserID)
+	s, err := session.ExtendCurrentSession(request.RefreshToken, authUser.UserID)
 	if err != nil {
 		return nil, http.StatusUnauthorized, err
 	}
 
-	permissions, err := permission.GetAllForUser(userModel.UserID)
-	if err != nil {
-		return nil, http.StatusInternalServerError, err
-	}
-
-	jwt, err := auth.SignUser(userModel, permissions)
+	jwt, err := auth.Sign(authUser)
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
 	}
@@ -103,13 +96,13 @@ func HandleRefresh(r *http.Request) (interface{}, int, error) {
 	return tokens, http.StatusOK, nil
 }
 
-func getAuthenticatedUser(r *http.Request) (user.User, error) {
-	value := r.Header.Get("Authorization")
-	s := strings.Split(value, "Bearer")
-	if len(s) != 2 {
-		return user.User{}, errors.New("authorization header is not of the form: Bearer <token>")
+func buildAuthUserModel(userModel user.User, permissions permission.UserPermissions) auth.User {
+	return auth.User{
+		UserID:      userModel.UserID,
+		FirstName:   userModel.FirstName,
+		LastName:    userModel.LastName,
+		Email:       userModel.Email,
+		Username:    userModel.Username,
+		Permissions: permissions,
 	}
-
-	token := strings.TrimSpace(s[1])
-	return auth.Verify(token)
 }

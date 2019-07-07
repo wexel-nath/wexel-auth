@@ -13,10 +13,22 @@ import (
 
 func main() {
 	config.Configure()
-	auth.Configure()
 	session.Configure()
+	configureAuth()
 
 	startServer()
+}
+
+func configureAuth() {
+	err := auth.Configure(auth.Config{
+		JwtIssuer:      config.GetJwtIssuer(),
+		JwtExpiry:      config.GetJwtExpiry(),
+		PublicKeyPath:  "keys/test.public.pem",
+		PrivateKeyPath: "keys/test.private.pem",
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func getListenAddress() string {
