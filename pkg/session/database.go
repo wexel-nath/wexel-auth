@@ -12,15 +12,15 @@ const (
 	// Columns
 	columnSessionID = "session_id"
 	columnUserID    = "user_id"
-	columnTimestamp = "timestamp"
-	columnExpiry    = "expiry"
+	columnCreated   = "session_created"
+	columnExpiry    = "session_expiry"
 )
 
 var (
 	sessionColumns = []string{
 		columnSessionID,
 		columnUserID,
-		columnTimestamp,
+		columnCreated,
 		columnExpiry,
 	}
 )
@@ -59,7 +59,7 @@ func selectActiveSession(sessionID string, userID int64) (map[string]interface{}
 			AND ` + columnExpiry + ` > $3
 	`
 
-	now := time.Now().Unix()
+	now := time.Now()
 
 	db := database.GetConnection()
 	row := db.QueryRow(query, sessionID, userID, now)
@@ -79,8 +79,8 @@ func updateSessionExpiry(sessionID string, userID int64, extension int64) (map[s
 		RETURNING
 			` + strings.Join(sessionColumns, ", ")
 
-	now := time.Now().Unix()
-	newExpiry := now + extension
+	now := time.Now()
+	newExpiry := now.Add(time.Duration(extension) * time.Minute)
 
 	db := database.GetConnection()
 	row := db.QueryRow(query, newExpiry, sessionID, userID, now)

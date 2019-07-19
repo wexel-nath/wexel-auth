@@ -12,7 +12,8 @@ import (
 )
 
 func TestInsert(t *testing.T) {
-	now := time.Now().Unix()
+	now := time.Now()
+	expiry := now.Add(30 * time.Minute)
 
 	type args struct{
 		sessionID string
@@ -38,7 +39,7 @@ func TestInsert(t *testing.T) {
 						"test.session.token.1",
 						int64(1),
 						now,
-						now + 300,
+						expiry,
 					},
 				},
 			},
@@ -46,8 +47,8 @@ func TestInsert(t *testing.T) {
 				row: map[string]interface{}{
 					columnSessionID: "test.session.token.1",
 					columnUserID:    int64(1),
-					columnTimestamp: now,
-					columnExpiry:    now + 300,
+					columnCreated:   now,
+					columnExpiry:    expiry,
 				},
 				err: nil,
 			},
@@ -71,8 +72,8 @@ func TestInsert(t *testing.T) {
 		INSERT INTO session \(
 			session_id,
 			user_id,
-			timestamp,
-			expiry
+			session_created,
+			session_expiry
 		\)
 		VALUES \(
 			(.+)
@@ -80,8 +81,8 @@ func TestInsert(t *testing.T) {
 		RETURNING
 			session_id,
 			user_id,
-			timestamp,
-			expiry
+			session_created,
+			session_expiry
 	`
 
 	for name, test := range tests {
@@ -143,7 +144,7 @@ func TestUpdateSessionExpiry(t *testing.T) {
 				row: map[string]interface{}{
 					columnSessionID: "test.session.token.1",
 					columnUserID:    int64(1),
-					columnTimestamp: now,
+					columnCreated:   now,
 					columnExpiry:    now + extension,
 				},
 				err: nil,
@@ -168,16 +169,16 @@ func TestUpdateSessionExpiry(t *testing.T) {
 		UPDATE
 			session
 		SET
-			expiry = \$1
+			session_expiry = \$1
 		WHERE
 			session_id = \$2
 			AND user_id = \$3
-			AND expiry > \$4
+			AND session_expiry > \$4
 		RETURNING
 			session_id,
 			user_id,
-			timestamp,
-			expiry
+			session_created,
+			session_expiry
 	`
 
 	for name, test := range tests {

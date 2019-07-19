@@ -8,7 +8,8 @@ import (
 )
 
 func TestNewSessionFromRow(t *testing.T) {
-	now := time.Now().Unix()
+	now := time.Now()
+	expiry := now.Add(30 * time.Minute)
 
 	type want struct{
 		session Session
@@ -22,24 +23,24 @@ func TestNewSessionFromRow(t *testing.T) {
 			row:  map[string]interface{}{
 				columnSessionID: "fake.session.id",
 				columnUserID:    int64(1),
-				columnTimestamp: now,
-				columnExpiry:    now + 300,
+				columnCreated:   now,
+				columnExpiry:    expiry,
 			},
 			want: want{
 				session: Session{
 					SessionID: "fake.session.id",
 					UserID:    1,
-					Timestamp: now,
-					Expiry:    now + 300,
+					Created:   now,
+					Expiry:    expiry,
 				},
 				wantErr: false,
 			},
 		},
 		"missing session id": {
 			row:  map[string]interface{}{
-				columnUserID:    int64(1),
-				columnTimestamp: now,
-				columnExpiry:    now + 300,
+				columnUserID:  int64(1),
+				columnCreated: now,
+				columnExpiry:  expiry,
 			},
 			want: want{
 				wantErr: true,
@@ -48,8 +49,8 @@ func TestNewSessionFromRow(t *testing.T) {
 		"missing user id": {
 			row:  map[string]interface{}{
 				columnSessionID: "fake.session.id",
-				columnTimestamp: now,
-				columnExpiry:    now + 300,
+				columnCreated:   now,
+				columnExpiry:    expiry,
 			},
 			want: want{
 				wantErr: true,
@@ -59,7 +60,7 @@ func TestNewSessionFromRow(t *testing.T) {
 			row:  map[string]interface{}{
 				columnSessionID: "fake.session.id",
 				columnUserID:    int64(1),
-				columnExpiry:    now + 300,
+				columnExpiry:    expiry,
 			},
 			want: want{
 				wantErr: true,
@@ -69,7 +70,7 @@ func TestNewSessionFromRow(t *testing.T) {
 			row:  map[string]interface{}{
 				columnSessionID: "fake.session.id",
 				columnUserID:    int64(1),
-				columnTimestamp: now,
+				columnCreated:   now,
 			},
 			want: want{
 				wantErr: true,
