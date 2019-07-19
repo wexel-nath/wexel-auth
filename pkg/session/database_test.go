@@ -109,6 +109,7 @@ func TestInsert(t *testing.T) {
 
 func TestUpdateSessionExpiry(t *testing.T) {
 	now := time.Now().Unix()
+	extension := int64(300)
 
 	type args struct{
 		sessionID string
@@ -134,7 +135,7 @@ func TestUpdateSessionExpiry(t *testing.T) {
 						"test.session.token.1",
 						int64(1),
 						now,
-						now + 300,
+						now + extension,
 					},
 				},
 			},
@@ -143,7 +144,7 @@ func TestUpdateSessionExpiry(t *testing.T) {
 					columnSessionID: "test.session.token.1",
 					columnUserID:    int64(1),
 					columnTimestamp: now,
-					columnExpiry:    now + 300,
+					columnExpiry:    now + extension,
 				},
 				err: nil,
 			},
@@ -194,7 +195,7 @@ func TestUpdateSessionExpiry(t *testing.T) {
 				query.WillReturnRows(mockRows)
 			}
 
-			row, err := updateSessionExpiry(test.sessionID, test.userID)
+			row, err := updateSessionExpiry(test.sessionID, test.userID, extension)
 
 			assert.Equal(st, test.row, row)
 			assert.Equal(st, test.err, err)

@@ -49,6 +49,11 @@ func getRoutes() []route {
 			handler: requestHandler(handler.Refresh),
 		},
 		{
+			method: http.MethodPost,
+			path:    "/logout",
+			handler: authRequestHandler(handler.Logout, "", ""),
+		},
+		{
 			method:  http.MethodPost,
 			path:    "/user",
 			handler: authRequestHandler(handler.CreateUser, "", "user.create"),

@@ -66,7 +66,7 @@ func selectActiveSession(sessionID string, userID int64) (map[string]interface{}
 	return database.ScanRowToMap(row, sessionColumns)
 }
 
-func updateSessionExpiry(sessionID string, userID int64) (map[string]interface{}, error) {
+func updateSessionExpiry(sessionID string, userID int64, extension int64) (map[string]interface{}, error) {
 	query := `
 		UPDATE
 			session
@@ -80,7 +80,7 @@ func updateSessionExpiry(sessionID string, userID int64) (map[string]interface{}
 			` + strings.Join(sessionColumns, ", ")
 
 	now := time.Now().Unix()
-	newExpiry := now + config.GetSessionExpiry()
+	newExpiry := now + extension
 
 	db := database.GetConnection()
 	row := db.QueryRow(query, newExpiry, sessionID, userID, now)

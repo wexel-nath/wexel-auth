@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 
+	"github.com/wexel-nath/wexel-auth/pkg/config"
 	"github.com/wexel-nath/wexel-auth/pkg/logger"
 )
 
@@ -44,7 +45,21 @@ func GetCurrentSession(sessionID string, userID int64) (Session, error) {
 func ExtendCurrentSession(sessionID string, userID int64) (Session, error) {
 	logger.Info("Updating current session[%s] for user[%d]", sessionID, userID)
 
-	row, err := updateSessionExpiry(sessionID, userID)
+	row, err := updateSessionExpiry(sessionID, userID, config.GetSessionExpiry())
+	if err == sql.ErrNoRows {
+		return Session{}, ErrSessionExpired
+	}
+	if err != nil {
+		return Session{}, err
+	}
+
+	return newSessionFromRow(row)
+}
+
+func EndCurrentSession(sessionID string, userID int64) (Session, error) {
+	logger.Info("Ending current session[%s] for user[%d]", sessionID, userID)
+
+	row, err := updateSessionExpiry(sessionID, userID, 0)
 	if err == sql.ErrNoRows {
 		return Session{}, ErrSessionExpired
 	}
