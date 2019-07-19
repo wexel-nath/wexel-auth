@@ -7,7 +7,7 @@ import (
 	"github.com/wexel-nath/wexel-auth/pkg/logger"
 )
 
-func middleware(handler httprouter.Handle) httprouter.Handle {
+func middlewareWrapper(handler httprouter.Handle) httprouter.Handle {
 	next := loggerWrapper(handler)
 	next = corsMiddleware(next)
 	return next

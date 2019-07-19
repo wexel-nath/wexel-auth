@@ -9,7 +9,7 @@ import (
 	"github.com/wexel-nath/wexel-auth/pkg/user"
 )
 
-func HandleCreateUser(r *http.Request, _ auth.User) (interface{}, int, error) {
+func CreateUser(r *http.Request, _ auth.User) (interface{}, int, error) {
 	body, err := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {
@@ -39,4 +39,8 @@ func HandleCreateUser(r *http.Request, _ auth.User) (interface{}, int, error) {
 		return nil, http.StatusBadRequest, err
 	}
 	return userModel, http.StatusCreated, nil
+}
+
+func GetUser(_ *http.Request, user auth.User) (interface{}, int, error) {
+	return user, http.StatusOK, nil
 }

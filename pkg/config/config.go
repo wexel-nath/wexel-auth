@@ -13,9 +13,11 @@ func Configure() {
 	viper.Set("SERVICE_NAME", "Authentication")
 
 	// Heroku Port
+	viper.SetDefault("PORT", "4000")
 	viper.BindEnv("PORT")
 
 	// Postgres URL
+	viper.SetDefault("DATABASE_URL", "")
 	viper.BindEnv("DATABASE_URL")
 }
 

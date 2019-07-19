@@ -1,7 +1,9 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/wexel-nath/wexel-auth/pkg/api/handler"
@@ -9,10 +11,15 @@ import (
 
 func GetRouter() *httprouter.Router {
 	router := httprouter.New()
+	endpointMethods := map[string][]string{}
 
 	for _, route := range getRoutes() {
-		router.Handle(route.method, route.pattern, middleware(route.handler))
-		router.Handle(http.MethodOptions, route.pattern, enableCors)
+		endpointMethods[route.path] = append(endpointMethods[route.path], route.method)
+		router.Handle(route.method, route.path, middlewareWrapper(route.handler))
+	}
+
+	for path, methods := range endpointMethods {
+		router.OPTIONS(path, constructOptions(methods))
 	}
 
 	return router
@@ -20,7 +27,7 @@ func GetRouter() *httprouter.Router {
 
 type route struct {
 	method  string
-	pattern string
+	path    string
 	handler httprouter.Handle
 }
 
@@ -28,30 +35,39 @@ func getRoutes() []route {
 	return []route{
 		{
 			method:  http.MethodGet,
-			pattern: "/healthz",
-			handler: requestHandler(handler.HandleHealthz),
+			path:    "/healthz",
+			handler: requestHandler(handler.Healthz),
 		},
 		{
 			method: http.MethodPost,
-			pattern: "/login",
-			handler: requestHandler(handler.HandleLogin),
+			path:    "/login",
+			handler: requestHandler(handler.Login),
 		},
 		{
 			method: http.MethodPost,
-			pattern: "/refresh",
-			handler: requestHandler(handler.HandleRefresh),
+			path:    "/refresh",
+			handler: requestHandler(handler.Refresh),
 		},
 		{
-			method: http.MethodPost,
-			pattern: "/user",
-			handler: authRequestHandler(handler.HandleCreateUser, "", "user.create"),
+			method:  http.MethodPost,
+			path:    "/user",
+			handler: authRequestHandler(handler.CreateUser, "", "user.create"),
+		},
+		{
+			method:  http.MethodGet,
+			path:    "/user",
+			handler: authRequestHandler(handler.GetUser, "", ""),
 		},
 	}
 }
 
-func enableCors(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-	w.WriteHeader(http.StatusNoContent)
+func constructOptions(methods []string) func(http.ResponseWriter, *http.Request, httprouter.Params) {
+	methodCsv := strings.Join(append(methods, "OPTIONS"), ",")
+	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", methodCsv)
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, "{}")
+	}
 }

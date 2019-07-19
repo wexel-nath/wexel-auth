@@ -13,11 +13,11 @@ import (
 
 type authResponse struct {
 	User    auth.User `json:"user"`
-	Jwt     string `json:"jwt_token"`
-	Refresh string `json:"refresh_token"`
+	Jwt     string    `json:"jwt_token"`
+	Refresh string    `json:"refresh_token"`
 }
 
-func HandleLogin(r *http.Request) (interface{}, int, error) {
+func Login(r *http.Request) (interface{}, int, error) {
 	body, err := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {
@@ -62,7 +62,7 @@ func HandleLogin(r *http.Request) (interface{}, int, error) {
 	return tokens, http.StatusOK, nil
 }
 
-func HandleRefresh(r *http.Request) (interface{}, int, error) {
+func Refresh(r *http.Request) (interface{}, int, error) {
 	authUser, err := auth.GetAuthenticatedUser(r)
 	if err != nil && err != auth.ErrExpiredToken {
 		return nil, http.StatusUnauthorized, err
