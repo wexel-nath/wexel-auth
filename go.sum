@@ -99,6 +99,10 @@ github.com/stretchr/testify v1.2.2 h1:bSDNvY7ZPG5RlJ8otE/7V6gMiyenm9RtJ7IUVIAoJ1
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20190109142713-0ad062ec5ee5/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
 github.com/ugorji/go v1.1.4/go.mod h1:uQMGLiO92mf5W77hV/PUCpI3pbzQx3CRekS0kk+RGrc=
+github.com/wexel-nath/authrouter v0.0.0-20190720054314-91399b403f7b h1:dTtaUBMyIAJuGc0molqBAyvwWqaHLC0c/tu7d9hKnEw=
+github.com/wexel-nath/authrouter v0.0.0-20190720054314-91399b403f7b/go.mod h1:xpuFvDxueINnR4zG612ErAB5E8blgF6lKQxS8H9qeZE=
+github.com/wexel-nath/jwt v0.0.0-20190720053518-a5b573a53699 h1:t4jdn2//dd0RP05dOBSgYhIHIvAYz2rPCMpyOEiAI1w=
+github.com/wexel-nath/jwt v0.0.0-20190720053518-a5b573a53699/go.mod h1:KScsyn+OVO6WF1nisbnV6xg6DkTwSLy9WtjTjbroA9g=
 github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2/go.mod h1:UETIi67q53MR2AWcXfiuqkDkRtnGDLqkBTpCHuJHxtU=
 github.com/xordataexchange/crypt v0.0.3-0.20170626215501-b2862e3d0a77/go.mod h1:aYKd//L2LvnjZzWKhF00oedf4jCCReLcmhLdhm1A27Q=
 go.etcd.io/bbolt v1.3.2/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=

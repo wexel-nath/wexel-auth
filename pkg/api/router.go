@@ -2,66 +2,100 @@ package api
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/wexel-nath/wexel-auth/pkg/api/handler"
+	"github.com/wexel-nath/authrouter"
+	"github.com/wexel-nath/jwt"
 )
 
-func GetRouter() *httprouter.Router {
-	router := httprouter.New()
+func GetRouter(publicKeyPath string) *authrouter.Router {
+	auth, err := jwt.NewAuthenticator(publicKeyPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	router := authrouter.NewRouter(auth)
 	endpointMethods := map[string][]string{}
 
-	for _, route := range getRoutes() {
-		endpointMethods[route.path] = append(endpointMethods[route.path], route.method)
-		router.Handle(route.method, route.path, middlewareWrapper(route.handler))
+	for authMethod, routes := range getRoutes() {
+		for _, route := range routes {
+			endpointMethods[route.path] = append(endpointMethods[route.path], route.method)
+
+			switch authMethod {
+			case "handle":
+				router.Handle(route.method, route.path, route.handler)
+			case "authenticated":
+				router.HandleWithAuthentication(route.method, route.path, route.uHandler)
+			case "authorized":
+				router.HandleWithAuthorization(
+					route.method,
+					route.path,
+					route.uHandler,
+					route.service,
+					route.capability,
+				)
+			}
+		}
 	}
 
 	for path, methods := range endpointMethods {
-		router.OPTIONS(path, constructOptions(methods))
+		router.HttpRouter.OPTIONS(path, constructOptions(methods))
 	}
 
 	return router
 }
 
 type route struct {
-	method  string
-	path    string
-	handler httprouter.Handle
+	method     string
+	path       string
+	handler    authrouter.Handler
+	service    string
+	capability string
+	uHandler   authrouter.HandlerWithUser
 }
 
-func getRoutes() []route {
-	return []route{
-		{
-			method:  http.MethodGet,
-			path:    "/healthz",
-			handler: requestHandler(handler.Healthz),
+func getRoutes() map[string][]route {
+	return map[string][]route{
+		"handle": {
+			{
+				method:  http.MethodGet,
+				path:    "/healthz",
+				handler: healthz,
+			},
+			{
+				method:  http.MethodPost,
+				path:    "/login",
+				handler: login,
+			},
+			{
+				method:  http.MethodPost,
+				path:    "/refresh",
+				handler: refresh,
+			},
 		},
-		{
-			method: http.MethodPost,
-			path:    "/login",
-			handler: requestHandler(handler.Login),
+		"authenticated": {
+			{
+				method:   http.MethodPost,
+				path:     "/logout",
+				uHandler: logout,
+			},
+			{
+				method:   http.MethodGet,
+				path:     "/user",
+				uHandler: getUser,
+			},
 		},
-		{
-			method: http.MethodPost,
-			path:    "/refresh",
-			handler: requestHandler(handler.Refresh),
-		},
-		{
-			method: http.MethodPost,
-			path:    "/logout",
-			handler: authRequestHandler(handler.Logout, "", ""),
-		},
-		{
-			method:  http.MethodPost,
-			path:    "/user",
-			handler: authRequestHandler(handler.CreateUser, "", "user.create"),
-		},
-		{
-			method:  http.MethodGet,
-			path:    "/user",
-			handler: authRequestHandler(handler.GetUser, "", ""),
+		"authorized": {
+			{
+				method:     http.MethodPost,
+				path:       "/user",
+				service:    "",
+				capability: "user.create",
+				uHandler:   createUser,
+			},
 		},
 	}
 }

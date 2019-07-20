@@ -9,6 +9,8 @@ func Configure() {
 	// Auth config
 	viper.Set("JWT_ISSUER", "wexel-auth.herokuapp.com")
 	viper.Set("JWT_EXPIRY", 5 * 60)
+	viper.Set("PUBLIC_KEY_PATH", "keys/test.public.pem")
+	viper.Set("PRIVATE_KEY_PATH", "keys/test.private.pem")
 	viper.Set("SESSION_EXPIRY", 60 * 60)
 	viper.Set("SERVICE_NAME", "Authentication")
 
@@ -27,6 +29,14 @@ func GetJwtIssuer() string {
 
 func GetJwtExpiry() int64 {
 	return viper.GetInt64("JWT_EXPIRY")
+}
+
+func GetPublicKeyPath() string {
+	return viper.GetString("PUBLIC_KEY_PATH")
+}
+
+func GetPrivateKeyPath() string {
+	return viper.GetString("PRIVATE_KEY_PATH")
 }
 
 func GetSessionExpiry() int64 {

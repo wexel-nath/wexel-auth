@@ -4,19 +4,19 @@ import (
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/wexel-nath/authrouter"
 	"github.com/wexel-nath/wexel-auth/pkg/logger"
 )
 
-func middlewareWrapper(handler httprouter.Handle) httprouter.Handle {
+func middlewareWrapper(handler authrouter.Handler) authrouter.Handler {
 	next := loggerWrapper(handler)
-	next = corsMiddleware(next)
 	return next
 }
 
-func loggerWrapper(next httprouter.Handle) httprouter.Handle {
-	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func loggerWrapper(next authrouter.Handler) authrouter.Handler {
+	return func(r *http.Request) (interface{}, interface{}, int) {
 		logger.Info("%s %s", r.Method, r.URL.Path)
-		next(w, r, p)
+		return next(r)
 	}
 }
 

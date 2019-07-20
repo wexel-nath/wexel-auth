@@ -1,19 +1,20 @@
-package handler
+package api
 
 import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
 
-	"github.com/wexel-nath/wexel-auth/pkg/auth"
+	"github.com/wexel-nath/wexel-auth/pkg/logger"
 	"github.com/wexel-nath/wexel-auth/pkg/user"
 )
 
-func CreateUser(r *http.Request, _ auth.User) (interface{}, int, error) {
+func createUser(r *http.Request, _ interface{}) (interface{}, interface{}, int) {
 	body, err := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {
-		return nil, http.StatusBadRequest, err
+		logger.Error(err)
+		return nil, err.Error(), http.StatusBadRequest
 	}
 
 	var request struct {
@@ -25,7 +26,8 @@ func CreateUser(r *http.Request, _ auth.User) (interface{}, int, error) {
 	}
 	err = json.Unmarshal(body, &request)
 	if err != nil {
-		return nil, http.StatusBadRequest, err
+		logger.Error(err)
+		return nil, err.Error(), http.StatusBadRequest
 	}
 
 	userModel, err := user.Create(
@@ -36,11 +38,12 @@ func CreateUser(r *http.Request, _ auth.User) (interface{}, int, error) {
 		request.Password,
 	)
 	if err != nil {
-		return nil, http.StatusBadRequest, err
+		logger.Error(err)
+		return nil, err.Error(), http.StatusBadRequest
 	}
-	return userModel, http.StatusCreated, nil
+	return userModel, nil, http.StatusCreated
 }
 
-func GetUser(_ *http.Request, user auth.User) (interface{}, int, error) {
-	return user, http.StatusOK, nil
+func getUser(_ *http.Request, user interface{}) (interface{}, interface{}, int) {
+	return user, nil, http.StatusOK
 }
