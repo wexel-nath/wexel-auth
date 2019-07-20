@@ -39,11 +39,11 @@ func insert(sessionID string, userID int64) (map[string]interface{}, error) {
 		RETURNING
 			` + strings.Join(sessionColumns, ", ")
 
-	timestamp := time.Now().Unix()
-	expiry := timestamp + config.GetSessionExpiry()
+	now := time.Now()
+	expiry := now.Add(config.GetSessionExpiry())
 
 	db := database.GetConnection()
-	row := db.QueryRow(query, sessionID, userID, timestamp, expiry)
+	row := db.QueryRow(query, sessionID, userID, now, expiry)
 	return database.ScanRowToMap(row, sessionColumns)
 }
 
@@ -66,7 +66,7 @@ func selectActiveSession(sessionID string, userID int64) (map[string]interface{}
 	return database.ScanRowToMap(row, sessionColumns)
 }
 
-func updateSessionExpiry(sessionID string, userID int64, extension int64) (map[string]interface{}, error) {
+func updateSessionExpiry(sessionID string, userID int64, extension time.Duration) (map[string]interface{}, error) {
 	query := `
 		UPDATE
 			session
@@ -80,7 +80,7 @@ func updateSessionExpiry(sessionID string, userID int64, extension int64) (map[s
 			` + strings.Join(sessionColumns, ", ")
 
 	now := time.Now()
-	newExpiry := now.Add(time.Duration(extension) * time.Minute)
+	newExpiry := now.Add(extension)
 
 	db := database.GetConnection()
 	row := db.QueryRow(query, newExpiry, sessionID, userID, now)

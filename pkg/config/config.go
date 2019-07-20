@@ -1,6 +1,8 @@
 package config
 
 import (
+	"time"
+
 	"github.com/spf13/viper"
 )
 
@@ -11,7 +13,7 @@ func Configure() {
 	viper.Set("JWT_EXPIRY", 5 * 60)
 	viper.Set("PUBLIC_KEY_PATH", "keys/test.public.pem")
 	viper.Set("PRIVATE_KEY_PATH", "keys/test.private.pem")
-	viper.Set("SESSION_EXPIRY", 60 * 60)
+	viper.Set("SESSION_EXPIRY", 60 * time.Minute)
 	viper.Set("SERVICE_NAME", "Authentication")
 
 	// Heroku Port
@@ -39,8 +41,8 @@ func GetPrivateKeyPath() string {
 	return viper.GetString("PRIVATE_KEY_PATH")
 }
 
-func GetSessionExpiry() int64 {
-	return viper.GetInt64("SESSION_EXPIRY")
+func GetSessionExpiry() time.Duration {
+	return viper.Get("SESSION_EXPIRY").(time.Duration)
 }
 
 func GetServiceName() string {

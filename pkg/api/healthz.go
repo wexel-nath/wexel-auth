@@ -2,9 +2,11 @@ package api
 
 import (
 	"net/http"
+
+	"github.com/wexel-nath/authrouter"
 )
 
-func healthz(r *http.Request) (interface{}, interface{}, int) {
+func healthz(_ *http.Request, _ authrouter.User) (interface{}, interface{}, int) {
 	result := struct{
 		Status string `json:"status"`
 	}{

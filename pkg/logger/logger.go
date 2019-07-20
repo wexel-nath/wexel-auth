@@ -53,3 +53,14 @@ func log(logLevel string, format string, a ...interface{}) {
 		fmt.Println("[" + logLevel + "] " + fmt.Sprintf(format, a...))
 	}
 }
+
+// Logger struct for authrouter
+type Logger struct {}
+
+func (l Logger) Info(format string, a ...interface{}) {
+	Info(format, a...)
+}
+
+func (l Logger) Error(err error, a ...interface{}) {
+	Error(err, a...)
+}

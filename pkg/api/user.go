@@ -5,11 +5,12 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/wexel-nath/authrouter"
 	"github.com/wexel-nath/wexel-auth/pkg/logger"
 	"github.com/wexel-nath/wexel-auth/pkg/user"
 )
 
-func createUser(r *http.Request, _ interface{}) (interface{}, interface{}, int) {
+func createUser(r *http.Request, _ authrouter.User) (interface{}, interface{}, int) {
 	body, err := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {
@@ -44,6 +45,6 @@ func createUser(r *http.Request, _ interface{}) (interface{}, interface{}, int) 
 	return userModel, nil, http.StatusCreated
 }
 
-func getUser(_ *http.Request, user interface{}) (interface{}, interface{}, int) {
+func getUser(_ *http.Request, user authrouter.User) (interface{}, interface{}, int) {
 	return user, nil, http.StatusOK
 }

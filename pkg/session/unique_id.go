@@ -22,7 +22,7 @@ func Configure() {
 func generateUniqueID(userID int64) (string, error) {
 	n := []int64{
 		userID,
-		time.Now().Unix(),
+		time.Now().UnixNano(),
 	}
 	return hashID.EncodeInt64(n)
 }

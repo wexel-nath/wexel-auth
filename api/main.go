@@ -32,6 +32,6 @@ func getListenAddress() string {
 func startServer() {
 	address := getListenAddress()
 	fmt.Println("Listening on " + address)
-	router := api.GetRouter(config.GetPublicKeyPath())
-	log.Fatal(http.ListenAndServe(address, router.HttpRouter))
+	router := api.GetRouter()
+	log.Fatal(http.ListenAndServe(address, router.GetHttpRouter()))
 }

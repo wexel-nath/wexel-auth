@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/wexel-nath/authrouter"
 	"github.com/wexel-nath/wexel-auth/pkg/jwt"
 	"github.com/wexel-nath/wexel-auth/pkg/logger"
 	"github.com/wexel-nath/wexel-auth/pkg/permission"
@@ -13,12 +14,12 @@ import (
 )
 
 type authResponse struct {
-	User    jwt.User `json:"user"`
-	Jwt     string    `json:"jwt"`
-	Refresh string    `json:"refresh_token"`
+	User    authrouter.User `json:"user"`
+	Jwt     string          `json:"jwt"`
+	Refresh string          `json:"refresh_token"`
 }
 
-func login(r *http.Request) (interface{}, interface{}, int) {
+func login(r *http.Request, _ authrouter.User) (interface{}, interface{}, int) {
 	body, err := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {
@@ -49,7 +50,7 @@ func login(r *http.Request) (interface{}, interface{}, int) {
 	}
 
 	jwtUser := buildJwtUser(userModel, permissions)
-	jwt, err := jwt.Sign(jwtUser)
+	jwtToken, err := jwt.Sign(jwtUser)
 	if err != nil {
 		logger.Error(err)
 		return nil, err.Error(), http.StatusInternalServerError
@@ -63,13 +64,13 @@ func login(r *http.Request) (interface{}, interface{}, int) {
 
 	tokens := authResponse{
 		User:    jwtUser,
-		Jwt:     jwt,
+		Jwt:     jwtToken,
 		Refresh: userSession.SessionID,
 	}
 	return tokens, nil, http.StatusOK
 }
 
-func refresh(r *http.Request) (interface{}, interface{}, int) {
+func refresh(r *http.Request, _ authrouter.User) (interface{}, interface{}, int) {
 	jwtUser, err := jwt.Authenticate(r)
 	if err != nil && err != jwt.ErrExpiredToken {
 		logger.Error(err)
@@ -98,20 +99,20 @@ func refresh(r *http.Request) (interface{}, interface{}, int) {
 		return nil, err.Error(), http.StatusUnauthorized
 	}
 
-	jwt, err := jwt.Sign(jwtUser)
+	jwtToken, err := jwt.Sign(jwtUser)
 	if err != nil {
 		logger.Error(err)
 		return nil, err.Error(), http.StatusInternalServerError
 	}
 
 	tokens := authResponse{
-		Jwt:     jwt,
+		Jwt:     jwtToken,
 		Refresh: s.SessionID,
 	}
 	return tokens, nil, http.StatusOK
 }
 
-func logout(r *http.Request, userInterface interface{}) (interface{}, interface{}, int) {
+func logout(r *http.Request, jwtUser authrouter.User) (interface{}, interface{}, int) {
 	body, err := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {
@@ -128,8 +129,7 @@ func logout(r *http.Request, userInterface interface{}) (interface{}, interface{
 		return nil, err.Error(), http.StatusBadRequest
 	}
 
-	user := userInterface.(jwt.User)
-	_, err = session.EndCurrentSession(request.RefreshToken, user.UserID)
+	_, err = session.EndCurrentSession(request.RefreshToken, jwtUser.UserID)
 	if err != nil {
 		logger.Error(err)
 		return nil, err.Error(), http.StatusUnauthorized
@@ -138,8 +138,8 @@ func logout(r *http.Request, userInterface interface{}) (interface{}, interface{
 	return nil, nil, http.StatusOK
 }
 
-func buildJwtUser(userModel user.User, permissions permission.UserPermissions) jwt.User {
-	return jwt.User{
+func buildJwtUser(userModel user.User, permissions permission.UserPermissions) authrouter.User {
+	return authrouter.User{
 		UserID:      userModel.UserID,
 		FirstName:   userModel.FirstName,
 		LastName:    userModel.LastName,
