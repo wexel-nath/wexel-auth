@@ -1,6 +1,8 @@
 package permission
 
 import (
+	"strings"
+
 	"github.com/lib/pq"
 	"github.com/wexel-nath/wexel-auth/pkg/database"
 )
@@ -20,21 +22,44 @@ var (
 		columnServiceName,
 		columnPermissions,
 	}
+
+	insertUserPermissionColumns = []string{
+		columnUserID,
+		columnPermissionID,
+	}
 )
 
 func insertUserPermissions(userID int64, permissionIDs []int64) error {
 	query := `
 		INSERT INTO user_permission (
-			` + columnUserID + `,
-			` + columnPermissionID + `
+			` + strings.Join(insertUserPermissionColumns, ", ") + `
 		)
-			SELECT
-				$1,
-				UNNEST($2)
+		SELECT
+			$1,
+			UNNEST($2)
 	`
 
 	db := database.GetConnection()
 	_, err := db.Exec(query, userID, pq.Array(permissionIDs))
+	return err
+}
+
+func insertUserPermissionByName(userID int64, permission string) error {
+	query := `
+		INSERT INTO user_permission (
+			` + strings.Join(insertUserPermissionColumns, ", ") + `
+		)
+		SELECT
+			$1,
+			` + columnPermissionID + `
+		FROM
+			permission
+		WHERE
+			` + columnPermissionName + ` = $2
+	`
+
+	db := database.GetConnection()
+	_, err := db.Exec(query, userID, permission)
 	return err
 }
 

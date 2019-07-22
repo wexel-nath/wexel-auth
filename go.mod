@@ -8,5 +8,5 @@ require (
 	github.com/speps/go-hashids v2.0.0+incompatible
 	github.com/spf13/viper v1.4.0
 	github.com/stretchr/testify v1.2.2
-	github.com/wexel-nath/authrouter v0.0.0-20190720120459-d9eb2a70f115
+	github.com/wexel-nath/authrouter v0.0.0-20190722235107-59f96d3ee0f5
 )

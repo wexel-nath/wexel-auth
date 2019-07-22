@@ -12,3 +12,9 @@ func GetAllForUser(userID int64) (UserPermissions, error) {
 
 	return newUserPermissionsFromRows(rows)
 }
+
+func AddUserPermission(userID int64, permission string) error {
+	logger.Info("Adding permission[%s] for user [%d]", permission, userID)
+
+	return insertUserPermissionByName(userID, permission)
+}

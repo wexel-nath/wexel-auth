@@ -14,7 +14,7 @@ func Configure() {
 	viper.Set("PUBLIC_KEY_PATH", "keys/test.public.pem")
 	viper.Set("PRIVATE_KEY_PATH", "keys/test.private.pem")
 	viper.Set("SESSION_EXPIRY", 60 * time.Minute)
-	viper.Set("SERVICE_NAME", "Authentication")
+	viper.Set("SERVICE_NAME", "authentication")
 
 	// Heroku Port
 	viper.SetDefault("PORT", "4000")

@@ -101,6 +101,8 @@ github.com/tmc/grpc-websocket-proxy v0.0.0-20190109142713-0ad062ec5ee5/go.mod h1
 github.com/ugorji/go v1.1.4/go.mod h1:uQMGLiO92mf5W77hV/PUCpI3pbzQx3CRekS0kk+RGrc=
 github.com/wexel-nath/authrouter v0.0.0-20190720120459-d9eb2a70f115 h1:DLnaq2G2z6ktCVEtFbC7VPrLxD32B+1ZWgxbHwUmh8U=
 github.com/wexel-nath/authrouter v0.0.0-20190720120459-d9eb2a70f115/go.mod h1:aa9C3x41XIpwzbho/EK6eRV/TswY0J6XPhTzT2hRNoA=
+github.com/wexel-nath/authrouter v0.0.0-20190722235107-59f96d3ee0f5 h1:AeKJGlj8IeO8K1H4o9hCUaiuq+663GQ6nLPkzz84xK4=
+github.com/wexel-nath/authrouter v0.0.0-20190722235107-59f96d3ee0f5/go.mod h1:aa9C3x41XIpwzbho/EK6eRV/TswY0J6XPhTzT2hRNoA=
 github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2/go.mod h1:UETIi67q53MR2AWcXfiuqkDkRtnGDLqkBTpCHuJHxtU=
 github.com/xordataexchange/crypt v0.0.3-0.20170626215501-b2862e3d0a77/go.mod h1:aYKd//L2LvnjZzWKhF00oedf4jCCReLcmhLdhm1A27Q=
 go.etcd.io/bbolt v1.3.2/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
