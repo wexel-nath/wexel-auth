@@ -8,10 +8,13 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
+	"github.com/wexel-nath/wexel-auth/pkg/config"
 	"github.com/wexel-nath/wexel-auth/pkg/database"
 )
 
 func TestInsert(t *testing.T) {
+	config.Configure()
+
 	now := time.Now()
 	expiry := now.Add(30 * time.Minute)
 
@@ -109,8 +112,8 @@ func TestInsert(t *testing.T) {
 }
 
 func TestUpdateSessionExpiry(t *testing.T) {
-	now := time.Now().Unix()
-	extension := int64(300)
+	now := time.Now()
+	extension := 30 * time.Minute
 
 	type args struct{
 		sessionID string
@@ -136,7 +139,7 @@ func TestUpdateSessionExpiry(t *testing.T) {
 						"test.session.token.1",
 						int64(1),
 						now,
-						now + extension,
+						now.Add(extension),
 					},
 				},
 			},
@@ -145,7 +148,7 @@ func TestUpdateSessionExpiry(t *testing.T) {
 					columnSessionID: "test.session.token.1",
 					columnUserID:    int64(1),
 					columnCreated:   now,
-					columnExpiry:    now + extension,
+					columnExpiry:    now.Add(extension),
 				},
 				err: nil,
 			},
