@@ -1,8 +1,6 @@
 package api
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/wexel-nath/authrouter"
@@ -20,18 +18,11 @@ type authResponse struct {
 }
 
 func login(r *http.Request, _ authrouter.User) (interface{}, interface{}, int) {
-	body, err := ioutil.ReadAll(r.Body)
-	defer r.Body.Close()
-	if err != nil {
-		logger.Error(err)
-		return nil, err.Error(), http.StatusBadRequest
-	}
-
 	var request struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
 	}
-	err = json.Unmarshal(body, &request)
+	err := unmarshalRequestBody(r, &request)
 	if err != nil {
 		logger.Error(err)
 		return nil, err.Error(), http.StatusBadRequest
@@ -77,17 +68,10 @@ func refresh(r *http.Request, _ authrouter.User) (interface{}, interface{}, int)
 		return nil, err.Error(), http.StatusUnauthorized
 	}
 
-	body, err := ioutil.ReadAll(r.Body)
-	defer r.Body.Close()
-	if err != nil {
-		logger.Error(err)
-		return nil, err.Error(), http.StatusBadRequest
-	}
-
 	var request struct {
 		RefreshToken string `json:"refresh_token"`
 	}
-	err = json.Unmarshal(body, &request)
+	err = unmarshalRequestBody(r, &request)
 	if err != nil {
 		logger.Error(err)
 		return nil, err.Error(), http.StatusBadRequest
@@ -113,17 +97,10 @@ func refresh(r *http.Request, _ authrouter.User) (interface{}, interface{}, int)
 }
 
 func logout(r *http.Request, jwtUser authrouter.User) (interface{}, interface{}, int) {
-	body, err := ioutil.ReadAll(r.Body)
-	defer r.Body.Close()
-	if err != nil {
-		logger.Error(err)
-		return nil, err.Error(), http.StatusBadRequest
-	}
-
 	var request struct {
 		RefreshToken string `json:"refresh_token"`
 	}
-	err = json.Unmarshal(body, &request)
+	err := unmarshalRequestBody(r, &request)
 	if err != nil {
 		logger.Error(err)
 		return nil, err.Error(), http.StatusBadRequest

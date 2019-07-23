@@ -4,8 +4,13 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"unicode"
 
 	"github.com/wexel-nath/wexel-auth/pkg/logger"
+)
+
+const (
+	weakPasswordMessage = "Your new password must be at least 8 characters, and include at least one number, lower case, and upper case letter."
 )
 
 func Create(
@@ -37,4 +42,30 @@ func Authenticate(username string, password string) (User, error) {
 	}
 
 	return newUserFromRow(row)
+}
+
+func ChangePassword(userID int64, password string) error {
+	logger.Info("Changing password for user[%d]", userID)
+
+	if !isValid(password) {
+		return fmt.Errorf(weakPasswordMessage)
+	}
+
+	_, err := updatePassword(userID, password)
+	return err
+}
+
+func isValid(password string) bool {
+	var hasNumber, hasLower, hasUpper bool
+	for _, c := range password {
+		switch {
+		case unicode.IsNumber(c):
+			hasNumber = true
+		case unicode.IsLower(c):
+			hasLower = true
+		case unicode.IsUpper(c):
+			hasUpper = true
+		}
+	}
+	return hasNumber && hasLower && hasUpper && len(password) >= 8
 }

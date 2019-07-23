@@ -39,6 +39,11 @@ var (
 			Path:    "/user",
 			Handler: getUser,
 		},
+		{
+			Method:  http.MethodPost,
+			Path:    "/change-password",
+			Handler: changePassword,
+		},
 	}
 
 	authorizedRoutes = []authrouter.Route{

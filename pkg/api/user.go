@@ -1,8 +1,6 @@
 package api
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"strings"
 
@@ -13,13 +11,6 @@ import (
 )
 
 func createUser(r *http.Request, _ authrouter.User) (interface{}, interface{}, int) {
-	body, err := ioutil.ReadAll(r.Body)
-	defer r.Body.Close()
-	if err != nil {
-		logger.Error(err)
-		return nil, err.Error(), http.StatusBadRequest
-	}
-
 	var request struct {
 		FirstName string `json:"first_name"`
 		LastName  string `json:"last_name"`
@@ -27,7 +18,7 @@ func createUser(r *http.Request, _ authrouter.User) (interface{}, interface{}, i
 		Username  string `json:"username"`
 		Service   string `json:"service_name"`
 	}
-	err = json.Unmarshal(body, &request)
+	err := unmarshalRequestBody(r, &request)
 	if err != nil {
 		logger.Error(err)
 		return nil, err.Error(), http.StatusBadRequest
@@ -56,6 +47,25 @@ func createUser(r *http.Request, _ authrouter.User) (interface{}, interface{}, i
 	return userModel, nil, http.StatusCreated
 }
 
-func getUser(_ *http.Request, user authrouter.User) (interface{}, interface{}, int) {
-	return user, nil, http.StatusOK
+func getUser(_ *http.Request, authUser authrouter.User) (interface{}, interface{}, int) {
+	return authUser, nil, http.StatusOK
+}
+
+func changePassword(r *http.Request, authUser authrouter.User) (interface{}, interface{}, int) {
+	var request struct {
+		NewPassword string `json:"new_password"`
+	}
+	err := unmarshalRequestBody(r, &request)
+	if err != nil {
+		logger.Error(err)
+		return nil, err.Error(), http.StatusBadRequest
+	}
+
+	err = user.ChangePassword(authUser.UserID, request.NewPassword)
+	if err != nil {
+		logger.Error(err)
+		return nil, err.Error(), http.StatusBadRequest
+	}
+
+	return authUser, nil, http.StatusOK
 }

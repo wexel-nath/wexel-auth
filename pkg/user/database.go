@@ -78,3 +78,19 @@ func selectByCredentials(username string, password string) (map[string]interface
 	row := db.QueryRow(query, username, password)
 	return database.ScanRowToMap(row, selectUserColumns)
 }
+
+func updatePassword(userID int64, password string) (map[string]interface{}, error) {
+	query := `
+		UPDATE
+			users
+		SET
+			` + columnPassword + ` = crypt($2, gen_salt('` + saltAlgorithm + `'))
+		WHERE
+			` + columnUserID + ` = $1
+		RETURNING
+			` + strings.Join(selectUserColumns, ", ")
+
+	db := database.GetConnection()
+	row := db.QueryRow(query, userID, password)
+	return database.ScanRowToMap(row, selectUserColumns)
+}
