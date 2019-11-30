@@ -13,6 +13,10 @@ const (
 	weakPasswordMessage = "Your new password must be at least 8 characters, and include at least one number, lower case, and upper case letter."
 )
 
+var (
+	ErrInvalidDetails = errors.New("Invalid username or password")
+)
+
 func Create(
 	firstName string,
 	lastName string,
@@ -35,10 +39,11 @@ func Authenticate(username string, password string) (User, error) {
 
 	row, err := selectByCredentials(username, password)
 	if err == sql.ErrNoRows {
-		return User{}, errors.New("Invalid username or password")
+		return User{}, ErrInvalidDetails
 	}
 	if err != nil {
-		return User{}, fmt.Errorf("authenticating user[%s] failed: %v", username, err)
+		logger.Error(err)
+		return User{}, ErrInvalidDetails
 	}
 
 	return newUserFromRow(row)

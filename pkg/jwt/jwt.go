@@ -37,6 +37,9 @@ func Sign(user authrouter.User) (string, error) {
 }
 
 func Authenticate(r *http.Request) (authrouter.User, error) {
-	user, err := authenticator.Authenticate(r)
-	return user, err
+	return authenticator.Authenticate(r)
+}
+
+func Authorize(r *http.Request, capability string) (authrouter.User, error) {
+	return authenticator.Authorize(r, "", capability)
 }

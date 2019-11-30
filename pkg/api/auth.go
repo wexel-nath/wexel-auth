@@ -17,40 +17,32 @@ type authResponse struct {
 	Refresh string          `json:"refresh_token"`
 }
 
-func login(r *http.Request, _ authrouter.User) (interface{}, interface{}, int) {
-	var request struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
-	}
-	err := unmarshalRequestBody(r, &request)
-	if err != nil {
-		logger.Error(err)
-		return nil, err.Error(), http.StatusBadRequest
-	}
+type loginRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
 
+func doLogin(request loginRequest) (authResponse, error) {
 	userModel, err := user.Authenticate(request.Username, request.Password)
 	if err != nil {
-		logger.Error(err)
-		return nil, err.Error(), http.StatusUnauthorized
+		logger.Warn(err)
+		return authResponse{}, err
 	}
 
 	permissions, err := permission.GetAllForUser(userModel.UserID)
 	if err != nil {
-		logger.Error(err)
-		return nil, err.Error(), http.StatusInternalServerError
+		return authResponse{}, err
 	}
 
 	jwtUser := buildJwtUser(userModel, permissions)
 	jwtToken, err := jwt.Sign(jwtUser)
 	if err != nil {
-		logger.Error(err)
-		return nil, err.Error(), http.StatusInternalServerError
+		return authResponse{}, err
 	}
 
 	userSession, err := session.Create(userModel.UserID)
 	if err != nil {
-		logger.Error(err)
-		return nil, err.Error(), http.StatusInternalServerError
+		return authResponse{}, err
 	}
 
 	tokens := authResponse{
@@ -58,14 +50,57 @@ func login(r *http.Request, _ authrouter.User) (interface{}, interface{}, int) {
 		Jwt:     jwtToken,
 		Refresh: userSession.SessionID,
 	}
-	return tokens, nil, http.StatusOK
+	return tokens, nil
 }
 
-func refresh(r *http.Request, _ authrouter.User) (interface{}, interface{}, int) {
+func login(w http.ResponseWriter, r *http.Request) {
+	var request loginRequest
+	err := unmarshalRequestBody(r, &request)
+	if err != nil {
+		logger.Error(err)
+		jsonResponse(w, http.StatusNotAcceptable, nil, http.StatusText(http.StatusNotAcceptable))
+		return
+	}
+
+	response, err := doLogin(request)
+	if err != nil {
+		status := http.StatusUnauthorized
+		if err != user.ErrInvalidDetails {
+			status = http.StatusInternalServerError
+			logger.Error(err)
+		}
+
+		jsonResponse(w, status, nil, err.Error())
+		return
+	}
+
+	jsonResponse(w, http.StatusOK, response, "")
+}
+
+func doRefresh(jwtUser authrouter.User, refreshToken string) (authResponse, error) {
+	s, err := session.ExtendCurrentSession(refreshToken, jwtUser.UserID)
+	if err != nil {
+		return authResponse{}, err
+	}
+
+	jwtToken, err := jwt.Sign(jwtUser)
+	if err != nil {
+		return authResponse{}, err
+	}
+
+	tokens := authResponse{
+		Jwt:     jwtToken,
+		Refresh: s.SessionID,
+	}
+	return tokens, nil
+}
+
+func refresh(w http.ResponseWriter, r *http.Request) {
 	jwtUser, err := jwt.Authenticate(r)
 	if err != nil && err != jwt.ErrExpiredToken {
 		logger.Error(err)
-		return nil, err.Error(), http.StatusUnauthorized
+		jsonResponse(w, http.StatusUnauthorized, nil, err.Error())
+		return
 	}
 
 	var request struct {
@@ -74,45 +109,51 @@ func refresh(r *http.Request, _ authrouter.User) (interface{}, interface{}, int)
 	err = unmarshalRequestBody(r, &request)
 	if err != nil {
 		logger.Error(err)
-		return nil, err.Error(), http.StatusBadRequest
+		jsonResponse(w, http.StatusNotAcceptable, nil, err.Error())
+		return
 	}
 
-	s, err := session.ExtendCurrentSession(request.RefreshToken, jwtUser.UserID)
+	response, err := doRefresh(jwtUser, request.RefreshToken)
 	if err != nil {
-		logger.Error(err)
-		return nil, err.Error(), http.StatusUnauthorized
+		status := http.StatusUnauthorized
+		if err != session.ErrSessionExpired {
+			status = http.StatusInternalServerError
+			logger.Error(err)
+		}
+
+		jsonResponse(w, status, nil, err.Error())
+		return
 	}
 
-	jwtToken, err := jwt.Sign(jwtUser)
-	if err != nil {
-		logger.Error(err)
-		return nil, err.Error(), http.StatusInternalServerError
-	}
-
-	tokens := authResponse{
-		Jwt:     jwtToken,
-		Refresh: s.SessionID,
-	}
-	return tokens, nil, http.StatusOK
+	jsonResponse(w, http.StatusOK, response, "")
 }
 
-func logout(r *http.Request, jwtUser authrouter.User) (interface{}, interface{}, int) {
+func logout(w http.ResponseWriter, r *http.Request) {
+	jwtUser, err := jwt.Authenticate(r)
+	if err != nil && err != jwt.ErrExpiredToken {
+		logger.Error(err)
+		jsonResponse(w, http.StatusUnauthorized, nil, err.Error())
+		return
+	}
+
 	var request struct {
 		RefreshToken string `json:"refresh_token"`
 	}
-	err := unmarshalRequestBody(r, &request)
+	err = unmarshalRequestBody(r, &request)
 	if err != nil {
 		logger.Error(err)
-		return nil, err.Error(), http.StatusBadRequest
+		jsonResponse(w, http.StatusNotAcceptable, nil, err.Error())
+		return
 	}
 
 	_, err = session.EndCurrentSession(request.RefreshToken, jwtUser.UserID)
 	if err != nil {
 		logger.Error(err)
-		return nil, err.Error(), http.StatusUnauthorized
+		jsonResponse(w, http.StatusUnauthorized, nil, err.Error())
+		return
 	}
 
-	return nil, nil, http.StatusOK
+	jsonResponse(w, http.StatusOK, nil, "")
 }
 
 func buildJwtUser(userModel user.User, permissions permission.UserPermissions) authrouter.User {

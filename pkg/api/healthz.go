@@ -2,15 +2,14 @@ package api
 
 import (
 	"net/http"
-
-	"github.com/wexel-nath/authrouter"
 )
 
-func healthz(_ *http.Request, _ authrouter.User) (interface{}, interface{}, int) {
+func healthz(w http.ResponseWriter, r *http.Request) {
 	result := struct{
 		Status string `json:"status"`
 	}{
 		Status: "ok",
 	}
-	return result, nil, http.StatusOK
+
+	jsonResponse(w, http.StatusOK, result, "")
 }

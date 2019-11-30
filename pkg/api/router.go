@@ -1,74 +1,33 @@
 package api
 
 import (
-	"log"
-	"net/http"
-
-	"github.com/wexel-nath/authrouter"
-	"github.com/wexel-nath/wexel-auth/pkg/config"
-	"github.com/wexel-nath/wexel-auth/pkg/logger"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/cors"
 )
 
-var (
-	routes = []authrouter.Route{
-		{
-			Method:  http.MethodGet,
-			Path:    "/healthz",
-			Handler: healthz,
-		},
-		{
-			Method:  http.MethodPost,
-			Path:    "/login",
-			Handler: login,
-		},
-		{
-			Method:  http.MethodPost,
-			Path:    "/refresh",
-			Handler: refresh,
-		},
-	}
+func GetRouter() chi.Router {
+	router := chi.NewRouter()
 
-	authenticatedRoutes = []authrouter.Route{
-		{
-			Method:  http.MethodPost,
-			Path:    "/logout",
-			Handler: logout,
-		},
-		{
-			Method:  http.MethodGet,
-			Path:    "/user",
-			Handler: getUser,
-		},
-		{
-			Method:  http.MethodPost,
-			Path:    "/change-password",
-			Handler: changePassword,
-		},
-	}
+	c := cors.New(cors.Options{
+		AllowedOrigins: []string{"*"},
+		AllowedMethods: []string{"GET", "POST", "OPTIONS"},
+		AllowedHeaders: []string{"Authorization", "Content-Type"},
+	})
+	router.Use(c.Handler)
 
-	authorizedRoutes = []authrouter.Route{
-		{
-			Method:     http.MethodPost,
-			Path:       "/user",
-			Service:    "",
-			Capability: "user.create",
-			Handler:    createUser,
-		},
-	}
-)
+	addRoutes(router)
+	return router
+}
 
-func GetRouter() *authrouter.Router {
-	auth, err := authrouter.NewAuthenticator(config.GetPublicKeyPath())
-	if err != nil {
-		log.Fatal(err)
-	}
+func addRoutes(r chi.Router) {
+	r.Get("/healthz", healthz)
 
-	routerConfig := authrouter.Config{
-		Routes:              routes,
-		AuthenticatedRoutes: authenticatedRoutes,
-		AuthorizedRoutes:    authorizedRoutes,
-		EnableCors:          true,
-	}
+	r.Post("/login", login)
+	r.Post("/refresh", refresh)
+	r.Post("/logout", logout)
 
-	return authrouter.New(auth, logger.Logger{}, routerConfig)
+	// authorized
+	r.Get("/user", getUser)
+	r.Post("/change-password", changePassword)
+	r.Post("/user", createUser)
 }
