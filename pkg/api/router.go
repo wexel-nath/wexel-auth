@@ -28,6 +28,8 @@ func addRoutes(r chi.Router) {
 
 	// authorized
 	r.Get("/user", getUser)
+	r.Get("/users", getAllUsers)
 	r.Post("/change-password", changePassword)
 	r.Post("/user", createUser)
+	r.Get("/service/{serviceName}/permissions", getServicePermissions)
 }

@@ -9,15 +9,22 @@ import (
 
 const (
 	// Columns
-	columnPermissionID = "permission_id"
-	columnPermissionName = "permission_name"
-	columnPermissions = "permissions"
-	columnServiceID = "service_id"
-	columnServiceName = "service_name"
-	columnUserID = "user_id"
+	columnPermissionID          = "permission_id"
+	columnPermissionName        = "permission_name"
+	columnPermissionDescription = "permission_description"
+	columnPermissions           = "permissions"
+	columnServiceID             = "service_id"
+	columnServiceName           = "service_name"
+	columnUserID                = "user_id"
 )
 
 var (
+	selectPermissionsColumns = []string{
+		columnPermissionID,
+		columnPermissionName,
+		columnPermissionDescription,
+	}
+
 	selectAllColumns = []string{
 		columnServiceName,
 		columnPermissions,
@@ -28,6 +35,26 @@ var (
 		columnPermissionID,
 	}
 )
+
+func selectAllForService(serviceName string) ([]map[string]interface{}, error) {
+	query := `
+		SELECT
+			` + strings.Join(selectPermissionsColumns, ", ") + `
+		FROM
+			permission
+			JOIN service USING (` + columnServiceID + `)
+		WHERE
+			` + columnServiceName + ` = $1
+			OR ` + columnServiceName + ` = 'all'
+	`
+
+	db := database.GetConnection()
+	rows, err := db.Query(query, serviceName)
+	if err != nil {
+		return nil, err
+	}
+	return database.ScanRowsToMap(rows, selectPermissionsColumns)
+}
 
 func insertUserPermissions(userID int64, permissionIDs []int64) error {
 	query := `

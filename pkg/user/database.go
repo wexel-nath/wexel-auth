@@ -94,3 +94,19 @@ func updatePassword(userID int64, password string) (map[string]interface{}, erro
 	row := db.QueryRow(query, userID, password)
 	return database.ScanRowToMap(row, selectUserColumns)
 }
+
+func selectAll() ([]map[string]interface{}, error) {
+	query := `
+		SELECT
+			` + strings.Join(selectUserColumns, ", ") + `
+		FROM
+			users
+	`
+
+	db := database.GetConnection()
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	return database.ScanRowsToMap(rows, selectUserColumns)
+}

@@ -1,6 +1,8 @@
 package permission
 
-import "github.com/wexel-nath/wexel-auth/pkg/logger"
+import (
+	"github.com/wexel-nath/wexel-auth/pkg/logger"
+)
 
 func GetAllForUser(userID int64) (UserPermissions, error) {
 	logger.Info("Getting all permissions for user[%d]", userID)
@@ -10,11 +12,17 @@ func GetAllForUser(userID int64) (UserPermissions, error) {
 		return UserPermissions{}, err
 	}
 
-	return newUserPermissionsFromRows(rows)
+	return newUserPermissions(rows)
 }
 
-func AddUserPermission(userID int64, permission string) error {
-	logger.Info("Adding permission[%s] for user [%d]", permission, userID)
+func AddUserPermissions(userID int64, permissions []int64) error {
+	logger.Info("Adding permissions %v for user [%d]", permissions, userID)
 
-	return insertUserPermissionByName(userID, permission)
+	return insertUserPermissions(userID, permissions)
+}
+
+func GetAllForService(serviceName string) ([]Permission, error) {
+	logger.Info("Getting permissions for service[%s]", serviceName)
+
+	return buildFromRows(selectAllForService(serviceName))
 }

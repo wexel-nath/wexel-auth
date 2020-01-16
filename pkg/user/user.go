@@ -31,7 +31,7 @@ func Create(
 		return User{}, fmt.Errorf("creating user[%s] failed: %v", username, err)
 	}
 
-	return newUserFromRow(row)
+	return newUser(row)
 }
 
 func Authenticate(username string, password string) (User, error) {
@@ -46,7 +46,7 @@ func Authenticate(username string, password string) (User, error) {
 		return User{}, ErrInvalidDetails
 	}
 
-	return newUserFromRow(row)
+	return newUser(row)
 }
 
 func ChangePassword(userID int64, password string) error {
@@ -73,4 +73,9 @@ func isValid(password string) bool {
 		}
 	}
 	return hasNumber && hasLower && hasUpper && len(password) >= 8
+}
+
+func GetAll() ([]User, error) {
+	rows, err := selectAll()
+	return buildFromRows(rows, err)
 }

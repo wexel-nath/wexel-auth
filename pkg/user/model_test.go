@@ -93,7 +93,7 @@ func TestNewUserFromRow(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(st *testing.T) {
-			user, err := newUserFromRow(test.row)
+			user, err := newUser(test.row)
 
 			assert.Equal(t, test.wantErr, err != nil)
 			if !test.wantErr {

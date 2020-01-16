@@ -1,8 +1,9 @@
 package session
 
 import (
-	"fmt"
 	"time"
+
+	"github.com/wexel-nath/wexel-auth/pkg/database"
 )
 
 type Session struct {
@@ -17,16 +18,16 @@ func newSessionFromRow(row map[string]interface{}) (Session, error) {
 	var ok bool
 
 	if session.SessionID, ok = row[columnSessionID].(string); !ok {
-		return session, fmt.Errorf("row[%v] does not contain field[%s] type[string]", row, columnSessionID)
+		return session, database.RowError(row, columnSessionID, "string")
 	}
 	if session.UserID, ok = row[columnUserID].(int64); !ok {
-		return session, fmt.Errorf("row[%v] does not contain field[%s] type int64", row, columnUserID)
+		return session, database.RowError(row, columnUserID, "int64")
 	}
 	if session.Created, ok = row[columnCreated].(time.Time); !ok {
-		return session, fmt.Errorf("row[%v] does not contain field[%s] type time.Time", row, columnCreated)
+		return session, database.RowError(row, columnCreated, "time.Time")
 	}
 	if session.Expiry, ok = row[columnExpiry].(time.Time); !ok {
-		return session, fmt.Errorf("row[%v] does not contain field[%s] type time.Time", row, columnExpiry)
+		return session, database.RowError(row, columnExpiry, "time.Time")
 	}
 
 	return session, nil
