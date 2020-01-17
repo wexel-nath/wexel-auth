@@ -1,7 +1,10 @@
 package user
 
 import (
+	"time"
+
 	"github.com/wexel-nath/wexel-auth/pkg/database"
+	"github.com/wexel-nath/wexel-auth/pkg/util"
 )
 
 // User represents a row of the user table
@@ -11,6 +14,7 @@ type User struct {
 	LastName  string `json:"last_name"`
 	Email     string `json:"email"`
 	Username  string `json:"username"`
+	LastLogin string `json:"last_login"`
 }
 
 func newUser(row map[string]interface{}) (User, error) {
@@ -31,6 +35,9 @@ func newUser(row map[string]interface{}) (User, error) {
 	}
 	if user.Username, ok = row[columnUsername].(string); !ok {
 		return user, database.RowError(row, columnUsername, "string")
+	}
+	if created, ok := row[columnSessionCreated].(time.Time); ok {
+		user.LastLogin = util.FormatTime(created)
 	}
 
 	return user, nil

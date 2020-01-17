@@ -15,6 +15,8 @@ const (
 	columnUsername  = "username"
 	columnPassword  = "password"
 
+	columnSessionCreated = "session_created"
+
 	// Crypto Salt Algorithm
 	saltAlgorithm = "bf"
 )
@@ -34,6 +36,15 @@ var (
 		columnLastName,
 		columnEmail,
 		columnUsername,
+	}
+
+	selectUserJoinSessionColumns = []string{
+		columnUserID,
+		columnFirstName,
+		columnLastName,
+		columnEmail,
+		columnUsername,
+		columnSessionCreated,
 	}
 )
 
@@ -97,10 +108,13 @@ func updatePassword(userID int64, password string) (map[string]interface{}, erro
 
 func selectAll() ([]map[string]interface{}, error) {
 	query := `
-		SELECT
-			` + strings.Join(selectUserColumns, ", ") + `
+		SELECT DISTINCT ON (` + columnUserID + `)
+			` + strings.Join(selectUserJoinSessionColumns, ", ") + `
 		FROM
 			users
+			LEFT JOIN session USING (` + columnUserID + `)
+		ORDER BY
+			` + columnUserID + `, ` + columnSessionCreated + ` DESC
 	`
 
 	db := database.GetConnection()
@@ -108,5 +122,5 @@ func selectAll() ([]map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	return database.ScanRowsToMap(rows, selectUserColumns)
+	return database.ScanRowsToMap(rows, selectUserJoinSessionColumns)
 }
