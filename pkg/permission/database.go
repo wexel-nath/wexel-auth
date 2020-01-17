@@ -63,7 +63,7 @@ func insertUserPermissions(userID int64, permissionIDs []int64) error {
 		)
 		SELECT
 			$1,
-			UNNEST($2)
+			UNNEST($2::INTEGER[])
 	`
 
 	db := database.GetConnection()
