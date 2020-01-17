@@ -13,23 +13,14 @@ type createUserRequest struct {
 	FirstName   string  `json:"first_name"`
 	LastName    string  `json:"last_name"`
 	Email       string  `json:"email"`
-	Password    string  `json:"password"`
-	Username    string  `json:"username"`
 	Permissions []int64 `json:"permissions"`
 }
 
 func doCreateUser(request createUserRequest) (user.User, error) {
-	// todo: this should generate a random password instead, after forgot/change password is ready
-	if request.Password == "" {
-		request.Password = "4Me2Change"
-	}
-
 	userModel, err := user.Create(
 		request.FirstName,
 		request.LastName,
 		request.Email,
-		request.Username,
-		request.Password,
 	)
 	if err != nil {
 		return user.User{}, err

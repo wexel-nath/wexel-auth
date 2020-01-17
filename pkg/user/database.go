@@ -90,6 +90,21 @@ func selectByCredentials(username string, password string) (map[string]interface
 	return database.ScanRowToMap(row, selectUserColumns)
 }
 
+func selectByUsername(username string) (map[string]interface{}, error) {
+	query := `
+		SELECT
+			` + strings.Join(selectUserColumns, ", ") + `
+		FROM
+			users
+		WHERE
+			` + columnUsername + ` = $1
+	`
+
+	db := database.GetConnection()
+	row := db.QueryRow(query, username)
+	return database.ScanRowToMap(row, selectUserColumns)
+}
+
 func updatePassword(userID int64, password string) (map[string]interface{}, error) {
 	query := `
 		UPDATE

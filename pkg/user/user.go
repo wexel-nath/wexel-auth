@@ -4,12 +4,15 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
 	"unicode"
 
 	"github.com/wexel-nath/wexel-auth/pkg/logger"
+	"github.com/wexel-nath/wexel-auth/pkg/util"
 )
 
 const (
+	defaultPassword = "4Me2Change"
 	weakPasswordMessage = "Your new password must be at least 8 characters, and include at least one number, lower case, and upper case letter."
 )
 
@@ -21,17 +24,49 @@ func Create(
 	firstName string,
 	lastName string,
 	email string,
-	username string,
-	password string,
 ) (User, error) {
-	logger.Info("Creating user[%s]", username)
+	logger.Info("Creating user[%s %s]", firstName, lastName)
 
-	row, err := insert(firstName, lastName, email, username, password)
+	username, err := generateUsername(firstName, lastName)
+	if err != nil {
+		return User{}, fmt.Errorf("creating user[%s] failed: %v", username, err)
+	}
+
+	row, err := insert(firstName, lastName, email, username, defaultPassword)
 	if err != nil {
 		return User{}, fmt.Errorf("creating user[%s] failed: %v", username, err)
 	}
 
 	return newUser(row)
+}
+
+// generates a username of the form 'flast', if taken then 'filast'
+func generateUsername(firstName string, lastName string) (string, error) {
+	first := strings.ToLower(util.StripWhitespace(firstName))
+	last := strings.ToLower(util.StripWhitespace(lastName))
+	firstPart := ""
+	for _, c := range first {
+		firstPart += string(c)
+		username := firstPart + last
+		taken, err := isUsernameTaken(firstPart + last)
+		if err != nil {
+			return "", err
+		}
+		if !taken {
+			return username, nil
+		}
+	}
+
+	return "", fmt.Errorf("could not find an available username for [%s %s]", firstName, lastName)
+}
+
+func isUsernameTaken(username string) (bool, error) {
+	_, err := selectByUsername(username)
+	if err == sql.ErrNoRows {
+		return false, nil
+	}
+
+	return true, err
 }
 
 func Authenticate(username string, password string) (User, error) {
