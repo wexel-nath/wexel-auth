@@ -1,0 +1,32 @@
+# build binary
+FROM golang:1.14-alpine as builder
+
+ENV CGO_ENABLED 0
+
+RUN apk update && apk add --no-cache git
+
+WORKDIR $GOPATH/src/app
+COPY . .
+
+# Fetch dependencies using go mod.
+RUN go mod download
+
+# Unit tests
+RUN go test ./...
+
+# Build the binary.
+RUN GOOS=linux \
+    GOARCH=amd64 \
+    go build \
+        -ldflags="-w -s" \
+        -o /go/bin/app \
+        cmd/api/main.go
+
+# Build image
+FROM scratch
+
+# Copy our static executable.
+COPY --from=builder /go/bin/app /app
+COPY --from=builder /go/src/app/keys /keys
+
+ENTRYPOINT ["/app"]

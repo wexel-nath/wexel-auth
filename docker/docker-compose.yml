@@ -1,0 +1,27 @@
+version: "3.4"
+
+services:
+  api:
+    image: wexel/auth:api
+    restart: unless-stopped
+    networks:
+      - wexel
+    environment:
+      PORT: ''
+      DATABASE_URL: ''
+
+  db-init:
+    image: wexel/auth:db-init
+    restart: 'no'
+    networks:
+      - wexel
+    environment:
+      DB_HOST: ''
+      DB_NAME: ''
+      DB_PASS: ''
+      DB_PORT: ''
+      DB_USER: ''
+
+networks:
+  wexel:
+    external: true

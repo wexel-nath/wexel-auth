@@ -1,0 +1,28 @@
+version: "3.4"
+
+services:
+  api:
+    depends_on:
+      - db
+    environment:
+      PORT: '4000'
+      DATABASE_URL: 'postgresql://nathanw:bonnie@db:5432/auth?sslmode=disable'
+
+  db:
+    image: postgres:12-alpine
+    restart: unless-stopped
+    networks:
+      - wexel
+    environment:
+      POSTGRES_PASSWORD: 'bonnie'
+      POSTGRES_USER: 'nathanw'
+    ports:
+      - '5432'
+
+  db-init:
+    environment:
+      DB_HOST: 'db'
+      DB_NAME: 'auth'
+      DB_PASS: 'bonnie'
+      DB_PORT: '5432'
+      DB_USER: 'nathanw'
