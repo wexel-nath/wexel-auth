@@ -2,16 +2,14 @@ version: "3.4"
 
 services:
   api:
-    depends_on:
-      - db
     environment:
       PORT: '4000'
       DATABASE_URL: ''
 
   db-init:
     environment:
-      DB_HOST: ''
+      DB_HOST: 'wexel-db-1.c4czuoeqw7cf.ap-southeast-2.rds.amazonaws.com'
       DB_NAME: 'auth'
       DB_PASS: ''
       DB_PORT: '5432'
-      DB_USER: ''
+      DB_USER: 'postgres'
