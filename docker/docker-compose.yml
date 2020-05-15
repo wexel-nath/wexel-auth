@@ -5,7 +5,9 @@ services:
     image: wexel/auth:api
     restart: unless-stopped
     networks:
-      - wexel
+      wexel:
+        aliases:
+          - auth-api
     environment:
       PORT: ''
       DATABASE_URL: ''
