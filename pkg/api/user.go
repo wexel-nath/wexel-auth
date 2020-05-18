@@ -35,17 +35,8 @@ func doCreateUser(request createUserRequest) (user.User, error) {
 }
 
 func createUser(w http.ResponseWriter, r *http.Request) {
-	_, err := jwt.Authorize(r, "user.create")
-	if err != nil && err != jwt.ErrExpiredToken {
-		if err != jwt.ErrExpiredToken {
-			logger.Error(err)
-		}
-		jsonResponse(w, http.StatusUnauthorized, nil, err.Error())
-		return
-	}
-
 	var request createUserRequest
-	err = unmarshalRequestBody(r, &request)
+	err := unmarshalRequestBody(r, &request)
 	if err != nil {
 		logger.Error(err)
 		jsonResponse(w, http.StatusNotAcceptable, nil, err.Error())
@@ -63,24 +54,20 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func getUser(w http.ResponseWriter, r *http.Request) {
-	jwtUser, err := jwt.Authenticate(r)
-	if err != nil && err != jwt.ErrExpiredToken {
-		if err != jwt.ErrExpiredToken {
-			logger.Error(err)
-		}
+	u, err := jwt.UserFromContext(r.Context())
+	if err != nil {
+		logger.Error(err)
 		jsonResponse(w, http.StatusUnauthorized, nil, err.Error())
 		return
 	}
 
-	jsonResponse(w, http.StatusOK, jwtUser, "")
+	jsonResponse(w, http.StatusOK, u, "")
 }
 
 func changePassword(w http.ResponseWriter, r *http.Request) {
-	jwtUser, err := jwt.Authenticate(r)
-	if err != nil && err != jwt.ErrExpiredToken {
-		if err != jwt.ErrExpiredToken {
-			logger.Error(err)
-		}
+	u, err := jwt.UserFromContext(r.Context())
+	if err != nil {
+		logger.Error(err)
 		jsonResponse(w, http.StatusUnauthorized, nil, err.Error())
 		return
 	}
@@ -95,26 +82,17 @@ func changePassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = user.ChangePassword(jwtUser.UserID, request.NewPassword)
+	err = user.ChangePassword(u.UserID, request.NewPassword)
 	if err != nil {
 		logger.Error(err)
 		jsonResponse(w, http.StatusNotAcceptable, nil, err.Error())
 		return
 	}
 
-	jsonResponse(w, http.StatusOK, jwtUser, "")
+	jsonResponse(w, http.StatusOK, u, "")
 }
 
-func getAllUsers(w http.ResponseWriter, r *http.Request) {
-	_, err := jwt.Authenticate(r)
-	if err != nil && err != jwt.ErrExpiredToken {
-		if err != jwt.ErrExpiredToken {
-			logger.Error(err)
-		}
-		jsonResponse(w, http.StatusUnauthorized, nil, err.Error())
-		return
-	}
-
+func getAllUsers(w http.ResponseWriter, _ *http.Request) {
 	users, err := user.GetAll()
 	if err != nil {
 		logger.Error(err)

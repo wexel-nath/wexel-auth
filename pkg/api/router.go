@@ -3,6 +3,8 @@ package api
 import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
+
+	"github.com/wexel-nath/wexel-auth/pkg/jwt"
 )
 
 func GetRouter() chi.Router {
@@ -26,10 +28,18 @@ func addRoutes(r chi.Router) {
 	r.Post("/refresh", refresh)
 	r.Post("/logout", logout)
 
-	// authorized
-	r.Get("/user", getUser)
-	r.Get("/users", getAllUsers)
-	r.Post("/change-password", changePassword)
-	r.Post("/user", createUser)
-	r.Get("/service/{serviceName}/permissions", getServicePermissions)
+	// authorized routes
+	r.With(jwt.AuthorizationMiddleware("user.create")).
+		Get("/service/{serviceName}/permissions", getServicePermissions)
+
+	r.With(jwt.AuthorizationMiddleware("user.create")).
+		Post("/user", createUser)
+
+	r.Route("/", func(r chi.Router) {
+		r.Use(jwt.Middleware)
+
+		r.Get("/user", getUser)
+		r.Get("/users", getAllUsers)
+		r.Post("/change-password", changePassword)
+	})
 }

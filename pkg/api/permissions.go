@@ -10,15 +10,6 @@ import (
 )
 
 func getServicePermissions(w http.ResponseWriter, r *http.Request) {
-	_, err := jwt.Authorize(r, "user.create")
-	if err != nil && err != jwt.ErrExpiredToken {
-		if err != jwt.ErrExpiredToken {
-			logger.Error(err)
-		}
-		jsonResponse(w, http.StatusUnauthorized, nil, err.Error())
-		return
-	}
-
 	serviceName := chi.URLParam(r, "serviceName")
 
 	permissions, err := permission.GetAllForService(serviceName)
