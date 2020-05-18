@@ -11,3 +11,4 @@ push() {
 
 push api
 push db-init
+push keygen

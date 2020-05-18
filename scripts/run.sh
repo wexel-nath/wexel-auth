@@ -9,4 +9,4 @@ run() {
 		docker-compose up --force-recreate -d "$@"
 }
 
-run api db-init
+run api db-init keygen

@@ -11,6 +11,10 @@ services:
     environment:
       PORT: ''
       DATABASE_URL: ''
+      PRIVATE_KEY_PATH: '/keys/private.pem'
+      PUBLIC_KEY_PATH: '/keys/public.pem'
+    volumes:
+      - /opt/docker/volumes/keys:/keys
 
   db-init:
     image: wexel/auth:db-init
@@ -23,6 +27,16 @@ services:
       DB_PASS: ''
       DB_PORT: ''
       DB_USER: ''
+
+  keygen:
+    image: wexel/auth:keygen
+    restart: 'no'
+    environment:
+      PASSPHRASE: ''
+      PRIVATE_KEY_PATH: '/keys/private.pem'
+      PUBLIC_KEY_PATH: '/keys/public.pem'
+    volumes:
+      - /opt/docker/volumes/keys:/keys
 
 networks:
   wexel:

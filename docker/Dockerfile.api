@@ -28,8 +28,5 @@ FROM scratch
 # Copy our static executable.
 COPY --from=builder /go/bin/app /app
 
-# Generate pem key pair
-COPY --from=builder /go/src/app/keys /keys
-
 EXPOSE 80
 ENTRYPOINT ["/app"]

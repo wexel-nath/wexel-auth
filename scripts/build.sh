@@ -14,3 +14,4 @@ build() {
 
 build api
 build db-init
+build keygen
