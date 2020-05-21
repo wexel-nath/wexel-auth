@@ -9,7 +9,7 @@ services:
         aliases:
           - auth-api
     environment:
-      PORT: ''
+      PORT: '80'
       DATABASE_URL: ''
       PRIVATE_KEY_PATH: '/keys/private.pem'
       PUBLIC_KEY_PATH: '/keys/public.pem'

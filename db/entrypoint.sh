@@ -1,15 +1,26 @@
 #!/bin/bash
 set -e
 
-# TODO: wait for db to be healthy
-sleep 20
-
 # check for required vars
 DB_HOST="${DB_HOST:?DB_HOST must be set}"
 DB_NAME="${DB_NAME:?DB_NAME must be set}"
 DB_PASS="${DB_PASS:?DB_PASS must be set}"
 DB_PORT="${DB_PORT:?DB_PORT must be set}"
 DB_USER="${DB_USER:?DB_USER must be set}"
+
+wait_for_db() {
+	echo "Waiting for the postgres container..."
+	for _ in {1..60}
+	do
+		if PGPASSWORD="$DB_PASS" pg_isready -U "$DB_USER" -h "$DB_HOST" -p "$DB_PORT"
+		then
+			return 0
+		fi
+		sleep 5
+	done
+	echo "pg_isready failed"
+	exit 1
+}
 
 connect() {
 	PGPASSWORD="$DB_PASS" \
@@ -78,6 +89,7 @@ maybe_run_updates() {
 	done
 }
 
+wait_for_db
 maybe_create_database
 maybe_create_schema
 
