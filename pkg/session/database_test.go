@@ -8,8 +8,8 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
-	"github.com/wexel-nath/wexel-auth/pkg/config"
-	"github.com/wexel-nath/wexel-auth/pkg/database"
+	"wexel-auth/pkg/config"
+	"wexel-auth/pkg/database"
 )
 
 func TestInsert(t *testing.T) {

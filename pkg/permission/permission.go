@@ -1,7 +1,7 @@
 package permission
 
 import (
-	"github.com/wexel-nath/wexel-auth/pkg/logger"
+	"wexel-auth/pkg/logger"
 )
 
 func GetAllForUser(userID int64) (UserPermissions, error) {

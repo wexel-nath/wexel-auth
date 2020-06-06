@@ -3,10 +3,10 @@ package api
 import (
 	"net/http"
 
-	"github.com/wexel-nath/wexel-auth/pkg/jwt"
-	"github.com/wexel-nath/wexel-auth/pkg/logger"
-	"github.com/wexel-nath/wexel-auth/pkg/permission"
-	"github.com/wexel-nath/wexel-auth/pkg/user"
+	"wexel-auth/pkg/jwt"
+	"wexel-auth/pkg/logger"
+	"wexel-auth/pkg/permission"
+	"wexel-auth/pkg/user"
 )
 
 type createUserRequest struct {

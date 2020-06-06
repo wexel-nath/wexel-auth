@@ -3,18 +3,19 @@ package api
 import (
 	"net/http"
 
-	"github.com/wexel-nath/authrouter"
-	"github.com/wexel-nath/wexel-auth/pkg/jwt"
-	"github.com/wexel-nath/wexel-auth/pkg/logger"
-	"github.com/wexel-nath/wexel-auth/pkg/permission"
-	"github.com/wexel-nath/wexel-auth/pkg/session"
-	"github.com/wexel-nath/wexel-auth/pkg/user"
+	"wexel-auth/pkg/jwt"
+	"wexel-auth/pkg/logger"
+	"wexel-auth/pkg/permission"
+	"wexel-auth/pkg/session"
+	"wexel-auth/pkg/user"
+
+	"github.com/wexel-nath/auth"
 )
 
 type authResponse struct {
-	User    authrouter.User `json:"user"`
-	Jwt     string          `json:"jwt"`
-	Refresh string          `json:"refresh_token"`
+	User    auth.User `json:"user"`
+	Jwt     string    `json:"jwt"`
+	Refresh string    `json:"refresh_token"`
 }
 
 type loginRequest struct {
@@ -77,7 +78,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 	jsonResponse(w, http.StatusOK, response, "")
 }
 
-func doRefresh(jwtUser authrouter.User, refreshToken string) (authResponse, error) {
+func doRefresh(jwtUser auth.User, refreshToken string) (authResponse, error) {
 	s, err := session.ExtendCurrentSession(refreshToken, jwtUser.UserID)
 	if err != nil {
 		return authResponse{}, err
@@ -156,13 +157,13 @@ func logout(w http.ResponseWriter, r *http.Request) {
 	jsonResponse(w, http.StatusOK, nil, "")
 }
 
-func buildJwtUser(userModel user.User, permissions permission.UserPermissions) authrouter.User {
-	return authrouter.User{
+func buildJwtUser(userModel user.User, permissions permission.UserPermissions) auth.User {
+	return auth.User{
 		UserID:      userModel.UserID,
 		FirstName:   userModel.FirstName,
 		LastName:    userModel.LastName,
 		Email:       userModel.Email,
 		Username:    userModel.Username,
-		Permissions: permissions,
+		Permissions: auth.Permissions(permissions),
 	}
 }

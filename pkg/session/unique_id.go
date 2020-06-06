@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/speps/go-hashids"
-	"github.com/wexel-nath/wexel-auth/pkg/logger"
+	"wexel-auth/pkg/logger"
 )
 
 var (

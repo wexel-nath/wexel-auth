@@ -3,8 +3,8 @@ package user
 import (
 	"time"
 
-	"github.com/wexel-nath/wexel-auth/pkg/database"
-	"github.com/wexel-nath/wexel-auth/pkg/util"
+	"wexel-auth/pkg/database"
+	"wexel-auth/pkg/util"
 )
 
 // User represents a row of the user table

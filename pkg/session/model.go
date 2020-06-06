@@ -3,7 +3,7 @@ package session
 import (
 	"time"
 
-	"github.com/wexel-nath/wexel-auth/pkg/database"
+	"wexel-auth/pkg/database"
 )
 
 type Session struct {

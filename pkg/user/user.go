@@ -7,8 +7,8 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/wexel-nath/wexel-auth/pkg/logger"
-	"github.com/wexel-nath/wexel-auth/pkg/util"
+	"wexel-auth/pkg/logger"
+	"wexel-auth/pkg/util"
 )
 
 const (

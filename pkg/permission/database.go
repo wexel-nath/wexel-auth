@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/lib/pq"
-	"github.com/wexel-nath/wexel-auth/pkg/database"
+	"wexel-auth/pkg/database"
 )
 
 const (

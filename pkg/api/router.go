@@ -4,7 +4,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
 
-	"github.com/wexel-nath/wexel-auth/pkg/jwt"
+	"wexel-auth/pkg/jwt"
 )
 
 func GetRouter() chi.Router {

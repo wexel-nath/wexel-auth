@@ -3,12 +3,12 @@ version: "3.4"
 services:
   api:
     environment:
-      DATABASE_URL: ''
+      DATABASE_URL: 'postgresql://postgres:Bonnie1011@wexel-db-1.c4czuoeqw7cf.ap-southeast-2.rds.amazonaws.com:5432/auth?sslmode=disable'
 
   db-init:
     environment:
       DB_HOST: 'wexel-db-1.c4czuoeqw7cf.ap-southeast-2.rds.amazonaws.com'
       DB_NAME: 'auth'
-      DB_PASS: ''
+      DB_PASS: 'Bonnie1011'
       DB_PORT: '5432'
       DB_USER: 'postgres'

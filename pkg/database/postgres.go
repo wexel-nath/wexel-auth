@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"log"
 
-	"github.com/wexel-nath/wexel-auth/pkg/config"
+	"wexel-auth/pkg/config"
 
 	_ "github.com/lib/pq"
 )

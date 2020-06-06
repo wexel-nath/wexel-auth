@@ -17,11 +17,9 @@ func Configure() {
 	_ = viper.BindEnv("PUBLIC_KEY_PATH")
 
 	// Heroku Port
-	viper.SetDefault("PORT", "4000")
 	_ = viper.BindEnv("PORT")
 
 	// Postgres URL
-	viper.SetDefault("DATABASE_URL", "")
 	_ = viper.BindEnv("DATABASE_URL")
 }
 

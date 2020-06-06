@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/wexel-nath/wexel-auth/pkg/logger"
+	"wexel-auth/pkg/logger"
 )
 
 type response struct {

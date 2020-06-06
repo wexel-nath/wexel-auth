@@ -3,10 +3,11 @@ package api
 import (
 	"net/http"
 
+	"wexel-auth/pkg/jwt"
+	"wexel-auth/pkg/logger"
+	"wexel-auth/pkg/permission"
+
 	"github.com/go-chi/chi"
-	"github.com/wexel-nath/wexel-auth/pkg/jwt"
-	"github.com/wexel-nath/wexel-auth/pkg/logger"
-	"github.com/wexel-nath/wexel-auth/pkg/permission"
 )
 
 func getServicePermissions(w http.ResponseWriter, r *http.Request) {

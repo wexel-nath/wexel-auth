@@ -1,14 +1,14 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
-	"github.com/wexel-nath/wexel-auth/pkg/api"
-	"github.com/wexel-nath/wexel-auth/pkg/config"
-	"github.com/wexel-nath/wexel-auth/pkg/jwt"
-	"github.com/wexel-nath/wexel-auth/pkg/session"
+	"wexel-auth/pkg/api"
+	"wexel-auth/pkg/config"
+	"wexel-auth/pkg/jwt"
+	"wexel-auth/pkg/logger"
+	"wexel-auth/pkg/session"
 )
 
 func main() {
@@ -31,7 +31,6 @@ func getListenAddress() string {
 
 func startServer() {
 	address := getListenAddress()
-	fmt.Println("Listening on " + address)
-	router := api.GetRouter()
-	log.Fatal(http.ListenAndServe(address, router))
+	logger.Info("Listening on %s", address)
+	log.Fatal(http.ListenAndServe(address, api.GetRouter()))
 }

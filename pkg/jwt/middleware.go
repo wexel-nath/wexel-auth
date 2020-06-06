@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/wexel-nath/authrouter"
-	"github.com/wexel-nath/wexel-auth/pkg/logger"
+	"github.com/wexel-nath/auth"
+	"wexel-auth/pkg/logger"
 )
 
 var (
@@ -56,10 +56,10 @@ func AuthorizationMiddleware(capability string) func(handler http.Handler) http.
 	}
 }
 
-func UserFromContext(ctx context.Context) (authrouter.User, error) {
-	if user, ok := ctx.Value(userKey).(authrouter.User); ok {
+func UserFromContext(ctx context.Context) (auth.User, error) {
+	if user, ok := ctx.Value(userKey).(auth.User); ok {
 		return user, nil
 	}
 
-	return authrouter.User{}, errors.New("no user in context")
+	return auth.User{}, errors.New("no user in context")
 }

@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/wexel-nath/wexel-auth/pkg/config"
-	"github.com/wexel-nath/wexel-auth/pkg/logger"
+	"wexel-auth/pkg/config"
+	"wexel-auth/pkg/logger"
 )
 
 var (

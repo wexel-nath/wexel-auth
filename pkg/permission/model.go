@@ -1,7 +1,7 @@
 package permission
 
 import (
-	"github.com/wexel-nath/wexel-auth/pkg/database"
+	"wexel-auth/pkg/database"
 )
 
 type UserPermissions map[string][]string

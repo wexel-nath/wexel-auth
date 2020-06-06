@@ -3,21 +3,22 @@ package jwt
 import (
 	"net/http"
 
-	"github.com/wexel-nath/authrouter"
-	"github.com/wexel-nath/wexel-auth/pkg/config"
-	"github.com/wexel-nath/wexel-auth/pkg/logger"
+	"wexel-auth/pkg/config"
+	"wexel-auth/pkg/logger"
+
+	"github.com/wexel-nath/auth"
 )
 
 var (
-	signer        *authrouter.Signer
-	authenticator *authrouter.Authenticator
+	signer        *auth.Signer
+	authenticator *auth.Authenticator
 
-	ErrExpiredToken = authrouter.ErrExpiredToken
+	ErrExpiredToken = auth.ErrExpiredToken
 )
 
 func Configure() {
 	var err error
-	signer, err = authrouter.NewSigner(
+	signer, err = auth.NewSigner(
 		config.GetJwtIssuer(),
 		config.GetJwtExpiry(),
 		config.GetPrivateKeyPath(),
@@ -26,20 +27,25 @@ func Configure() {
 		logger.Error(err)
 	}
 
-	authenticator, err = authrouter.NewAuthenticator(config.GetPublicKeyPath())
+	authenticator, err = auth.NewAuthenticator(config.GetPublicKeyPath())
 	if err != nil {
 		logger.Error(err)
 	}
 }
 
-func Sign(user authrouter.User) (string, error) {
-	return signer.Sign(authrouter.User(user))
+func Sign(user auth.User) (string, error) {
+	return signer.Sign(user)
 }
 
-func Authenticate(r *http.Request) (authrouter.User, error) {
+func Authenticate(r *http.Request) (auth.User, error) {
 	return authenticator.Authenticate(r)
 }
 
-func Authorize(r *http.Request, capability string) (authrouter.User, error) {
-	return authenticator.Authorize(r, "", capability)
+func Authorize(r *http.Request, capability string) (auth.User, error) {
+	user, err := Authenticate(r)
+	if err != nil {
+		return user, err
+	}
+
+	return user, user.IsAuthorized(config.GetServiceName(), []string{capability})
 }

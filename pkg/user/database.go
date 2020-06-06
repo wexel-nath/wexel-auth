@@ -3,7 +3,7 @@ package user
 import (
 	"strings"
 
-	"github.com/wexel-nath/wexel-auth/pkg/database"
+	"wexel-auth/pkg/database"
 )
 
 const (
