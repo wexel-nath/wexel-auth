@@ -16,6 +16,12 @@ services:
       - /opt/docker/volumes/keys:/keys
     networks:
       - traefik
+    labels:
+      - "traefik.http.middlewares.strip.stripprefix.prefixes=/auth"
+      - "traefik.http.routers.auth.middlewares=strip@docker"
+      - "traefik.http.routers.auth.rule=PathPrefix(`/auth`)"
+      - "traefik.http.routers.auth.entrypoints=https"
+      - "traefik.http.routers.auth.tls.certresolver=myresolver"
     deploy:
       restart_policy:
         condition: on-failure
@@ -34,7 +40,6 @@ services:
 
   keygen:
     image: wexel/auth:keygen
-    restart: 'no'
     environment:
       PASSPHRASE: ''
       PRIVATE_KEY_PATH: '/keys/private.pem'

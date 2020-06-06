@@ -1,0 +1,25 @@
+version: "3.1"
+
+networks:
+  backend:
+    external: false
+
+services:
+  api:
+    networks:
+      - backend
+  db:
+    image: postgres:12-alpine
+    environment:
+      POSTGRES_PASSWORD: "${DB_PASS}"
+      POSTGRES_USER: "${DB_USER}"
+    networks:
+      backend: {aliases: [db]}
+    ports:
+      - '5432'
+    deploy:
+      restart_policy:
+        condition: on-failure
+  db-init:
+    networks:
+      - backend

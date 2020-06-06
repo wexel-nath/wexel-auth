@@ -1,15 +1,17 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
 PROJECT_NAME="${PROJECT_NAME:-auth}"
-NETWORK_NAME="${NETWORK_NAME:-wexel}"
-[ -z $(docker network ls --filter name=^${NETWORK_NAME}$ --format="{{ .Name }}") ] \
-	&& docker network create "$NETWORK_NAME"
 
 run() {
-	COMPOSE_FILE='docker/docker-compose.yml:docker/docker-compose.dev.yml' \
-	COMPOSE_PROJECT_NAME="$PROJECT_NAME" \
-		docker-compose up --force-recreate -d "$@"
+	DATABASE_URL='postgresql://nathanw:bonnie@db:5432/auth?sslmode=disable' \
+	DB_HOST='db' \
+	DB_PASS='bonnie' \
+	DB_USER='nathanw' \
+	docker stack deploy \
+		--compose-file 'docker/docker-stack.yml' \
+		--compose-file 'docker/docker-stack.dev.yml' \
+		"$PROJECT_NAME"
 }
 
-run api db-init keygen
+run
