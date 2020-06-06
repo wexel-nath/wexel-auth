@@ -12,7 +12,9 @@ steps:
     title: "Building api Image"
     type: "build"
     image_name: "wexel/auth"
-      tag: "api-${{CF_SHORT_REVISION}}"
+    tags:
+      - "api"
+      - "api-${{CF_SHORT_REVISION}}"
     working_directory: "${{clone}}"
     dockerfile: "docker/Dockerfile.api"
 
@@ -20,7 +22,9 @@ steps:
     title: "Building db-init Image"
     type: "build"
     image_name: "wexel/auth"
-      tag: "db-init-${{CF_SHORT_REVISION}}"
+    tags:
+      - "db_init"
+      - "db-init-${{CF_SHORT_REVISION}}"
     working_directory: "${{clone}}"
     dockerfile: "docker/Dockerfile.db-init"
 
@@ -28,6 +32,8 @@ steps:
     title: "Building keygen Image"
     type: "build"
     image_name: "wexel/auth"
-      tag: "keygen-${{CF_SHORT_REVISION}}"
+    tags:
+      - "keygen"
+      - "keygen-${{CF_SHORT_REVISION}}"
     working_directory: "${{clone}}"
     dockerfile: "docker/Dockerfile.keygen"
