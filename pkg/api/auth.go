@@ -90,6 +90,7 @@ func doRefresh(jwtUser auth.User, refreshToken string) (authResponse, error) {
 	}
 
 	tokens := authResponse{
+		User:    jwtUser,
 		Jwt:     jwtToken,
 		Refresh: s.SessionID,
 	}
