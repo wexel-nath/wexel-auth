@@ -42,6 +42,7 @@ steps:
     image: codefresh/remote-docker
     working_directory: ${{clone}}
     commands:
+      - export IMAGE_TAG="-${{CF_SHORT_REVISION}}"
       - >-
         rdocker 'ec2-user@ec2-13-210-184-139.ap-southeast-2.compute.amazonaws.com'
         docker stack deploy

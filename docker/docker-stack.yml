@@ -6,7 +6,7 @@ networks:
 
 services:
   api:
-    image: wexel/auth:api
+    image: "wexel/auth:api${IMAGE_TAG:-}"
     environment:
       PORT: '80'
       DATABASE_URL: "${DATABASE_URL}"
@@ -27,7 +27,7 @@ services:
         condition: on-failure
 
   db-init:
-    image: wexel/auth:db-init
+    image: "wexel/auth:db-init${IMAGE_TAG:-}"
     environment:
       DB_HOST: "${DB_HOST}"
       DB_NAME: 'auth'
@@ -39,7 +39,7 @@ services:
         condition: none
 
   keygen:
-    image: wexel/auth:keygen
+    image: "wexel/auth:keygen${IMAGE_TAG:-}"
     environment:
       PASSPHRASE: ''
       PRIVATE_KEY_PATH: '/keys/private.pem'
