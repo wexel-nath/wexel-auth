@@ -1,0 +1,46 @@
+version: "3.1"
+
+networks:
+  traefik:
+    external: true
+
+services:
+  api:
+    image: wexel/auth:api
+    environment:
+      PORT: '80'
+      DATABASE_URL: "${DATABASE_URL}"
+      PRIVATE_KEY_PATH: '/keys/private.pem'
+      PUBLIC_KEY_PATH: '/keys/public.pem'
+    volumes:
+      - /opt/docker/volumes/keys:/keys
+    networks:
+      - traefik
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+  db-init:
+    image: wexel/auth:db-init
+    environment:
+      DB_HOST: "${DB_HOST:}"
+      DB_NAME: 'auth'
+      DB_PASS: "${DB_PASS:}"
+      DB_PORT: '5432'
+      DB_USER: "${DB_USER:}"
+    deploy:
+      restart_policy:
+        condition: none
+
+  keygen:
+    image: wexel/auth:keygen
+    restart: 'no'
+    environment:
+      PASSPHRASE: ''
+      PRIVATE_KEY_PATH: '/keys/private.pem'
+      PUBLIC_KEY_PATH: '/keys/public.pem'
+    volumes:
+      - /opt/docker/volumes/keys:/keys
+    deploy:
+      restart_policy:
+        condition: none
