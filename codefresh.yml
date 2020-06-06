@@ -1,0 +1,33 @@
+version: "1.0"
+
+steps:
+  clone:
+    title: "Cloning repository"
+    type: "git-clone"
+    repo: "wexel-nath/wexel-auth"
+    revision: "${{CF_BRANCH}}"
+    git: "github"
+
+  build_api:
+    title: "Building api Image"
+    type: "build"
+    image_name: "wexel/auth"
+      tag: "api-${{CF_SHORT_REVISION}}"
+    working_directory: "${{clone}}"
+    dockerfile: "docker/Dockerfile.api"
+
+  build_db_init:
+    title: "Building db-init Image"
+    type: "build"
+    image_name: "wexel/auth"
+      tag: "db-init-${{CF_SHORT_REVISION}}"
+    working_directory: "${{clone}}"
+    dockerfile: "docker/Dockerfile.db-init"
+
+  build_keygen:
+    title: "Building keygen Image"
+    type: "build"
+    image_name: "wexel/auth"
+      tag: "keygen-${{CF_SHORT_REVISION}}"
+    working_directory: "${{clone}}"
+    dockerfile: "docker/Dockerfile.keygen"
