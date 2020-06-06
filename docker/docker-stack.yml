@@ -9,7 +9,7 @@ services:
     image: wexel/auth:api
     environment:
       PORT: '80'
-      DATABASE_URL: "${DATABASE_URL}"
+      DATABASE_URL: "${DATABASE_URL:-}"
       PRIVATE_KEY_PATH: '/keys/private.pem'
       PUBLIC_KEY_PATH: '/keys/public.pem'
     volumes:
@@ -23,11 +23,11 @@ services:
   db-init:
     image: wexel/auth:db-init
     environment:
-      DB_HOST: "${DB_HOST:}"
+      DB_HOST: "${DB_HOST:-}"
       DB_NAME: 'auth'
-      DB_PASS: "${DB_PASS:}"
+      DB_PASS: "${DB_PASS:-}"
       DB_PORT: '5432'
-      DB_USER: "${DB_USER:}"
+      DB_USER: "${DB_USER:-}"
     deploy:
       restart_policy:
         condition: none
