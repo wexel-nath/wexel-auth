@@ -8,33 +8,58 @@ steps:
     revision: "${{CF_BRANCH}}"
     git: "github"
 
+  semver_tags:
+    title: "Setting semantic version tags"
+    type: "freestyle"
+    image: "wexel/docker-semver:latest"
+    environment:
+      - IMAGE_TAGS_URL=https://registry.hub.docker.com/v2/repositories/wexel/auth-api/tags
+      - GIT_COMMIT_MSG=${{CF_COMMIT_MESSAGE}}
+    commands:
+      - >-
+        export TAGS=$(docker-semver);
+        [ $(echo "$TAGS" | wc -w) != "3" ] && exit 1
+      - >-
+        for tag in $TAGS; do
+        [ -z "$MAJOR_TAG" ] && MAJOR_TAG="$tag" && continue;
+        [ -z "$MINOR_TAG" ] && MINOR_TAG="$tag" && continue;
+        [ -z "$PATCH_TAG" ] && PATCH_TAG="$tag" && break;
+        done
+      - cf_export MAJOR_TAG MINOR_TAG PATCH_TAG
+
   build_api:
     title: "Building api Image"
     type: "build"
-    image_name: "wexel/auth"
+    image_name: "wexel/auth-api"
     tags:
-      - "api"
-      - "api-${{CF_SHORT_REVISION}}"
+      - "latest"
+      - "${{MAJOR_TAG}}"
+      - "${{MINOR_TAG}}"
+      - "${{PATCH_TAG}}"
     working_directory: "${{clone}}"
     dockerfile: "docker/Dockerfile.api"
 
   build_db_init:
     title: "Building db-init Image"
     type: "build"
-    image_name: "wexel/auth"
+    image_name: "wexel/auth-db-init"
     tags:
-      - "db_init"
-      - "db-init-${{CF_SHORT_REVISION}}"
+      - "latest"
+      - "${{MAJOR_TAG}}"
+      - "${{MINOR_TAG}}"
+      - "${{PATCH_TAG}}"
     working_directory: "${{clone}}"
     dockerfile: "docker/Dockerfile.db-init"
 
   build_keygen:
     title: "Building keygen Image"
     type: "build"
-    image_name: "wexel/auth"
+    image_name: "wexel/auth-keygen"
     tags:
-      - "keygen"
-      - "keygen-${{CF_SHORT_REVISION}}"
+      - "latest"
+      - "${{MAJOR_TAG}}"
+      - "${{MINOR_TAG}}"
+      - "${{PATCH_TAG}}"
     working_directory: "${{clone}}"
     dockerfile: "docker/Dockerfile.keygen"
 
@@ -42,7 +67,7 @@ steps:
     image: codefresh/remote-docker
     working_directory: ${{clone}}
     commands:
-      - export IMAGE_TAG="-${{CF_SHORT_REVISION}}"
+      - export IMAGE_TAG="${{PATCH_TAG}}"
       - >-
         rdocker 'ec2-user@ec2-13-210-184-139.ap-southeast-2.compute.amazonaws.com'
         docker stack deploy
