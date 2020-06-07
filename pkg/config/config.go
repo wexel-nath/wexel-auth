@@ -15,6 +15,7 @@ func Configure() {
 	viper.Set("SERVICE_NAME", "authentication")
 	_ = viper.BindEnv("PRIVATE_KEY_PATH")
 	_ = viper.BindEnv("PUBLIC_KEY_PATH")
+	_ = viper.BindEnv("IMAGE_TAG")
 
 	// Heroku Port
 	_ = viper.BindEnv("PORT")
@@ -53,4 +54,8 @@ func GetPort() string {
 
 func GetDatabaseURL() string {
 	return viper.GetString("DATABASE_URL")
+}
+
+func GetImageTag() string {
+	return viper.GetString("IMAGE_TAG")
 }

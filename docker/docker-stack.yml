@@ -10,6 +10,7 @@ services:
     environment:
       PORT: '80'
       DATABASE_URL: "${DATABASE_URL}"
+      IMAGE_TAG: "${IMAGE_TAG:-latest}"
       PRIVATE_KEY_PATH: '/keys/private.pem'
       PUBLIC_KEY_PATH: '/keys/public.pem'
     volumes:
