@@ -21,9 +21,9 @@ steps:
         [ $(echo "$TAGS" | wc -w) != "3" ] && exit 1
       - >-
         for tag in $TAGS; do
-        [ -z "$MAJOR_TAG" ] && MAJOR_TAG="$tag" && continue;
-        [ -z "$MINOR_TAG" ] && MINOR_TAG="$tag" && continue;
-        [ -z "$PATCH_TAG" ] && PATCH_TAG="$tag" && break;
+        [ -z "$MAJOR_TAG" ] && export MAJOR_TAG="$tag" && continue;
+        [ -z "$MINOR_TAG" ] && export MINOR_TAG="$tag" && continue;
+        [ -z "$PATCH_TAG" ] && export PATCH_TAG="$tag" && break;
         done
       - cf_export MAJOR_TAG MINOR_TAG PATCH_TAG
 
